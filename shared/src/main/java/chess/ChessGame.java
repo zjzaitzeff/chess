@@ -13,7 +13,7 @@ public class ChessGame {
     ChessBoard the_board;
     public ChessGame() {
         the_board = new ChessBoard();
-        whose_turn = ChessGame.TeamColor.WHITE;
+        whose_turn = TeamColor.WHITE;
     }
 
     /**
@@ -80,7 +80,30 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition king_position = null;
+        for (int i=1;i<9;i++) {
+            for (int j=1; j<9;j++) {
+                ChessPosition current_position = new ChessPosition(i,j);
+                if (ChessPiece.PieceType.KING.equals(the_board.getPiece(current_position).getPieceType()) && teamColor.equals(the_board.getPiece(current_position).getTeamColor())) {
+                    king_position = current_position;
+                }
+            }
+        }
+        for (int i=1;i<9;i++) {
+            for (int j=1;j<9;j++) {
+                ChessPosition current_position = new ChessPosition(i,j);
+                ChessPiece p = the_board.getPiece(current_position);
+                if (!teamColor.equals(p.getTeamColor())) {
+                    Collection<ChessMove> moves = validMoves(current_position);
+                    for (ChessMove move : moves) {
+                        if (move.getEndPosition().equals(king_position)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
