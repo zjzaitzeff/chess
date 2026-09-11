@@ -52,62 +52,62 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        int r = myPosition.getRow();
-        int c = myPosition.getColumn();
-        PieceType type = board.getPiece(myPosition).getPieceType();
-        // pawn
-        if (type.equals(PieceType.PAWN)) {
-        return pawn_moves(board, myPosition);}
-        // rook
-        else if (type.equals(PieceType.ROOK)) {
-            return rook_moves(board, myPosition);
-        }
-        // knight
-        else if (type.equals(PieceType.KNIGHT)) {
-            return rook_moves(board, myPosition);
-        }
-        // bishop
-        else if (type.equals(PieceType.BISHOP)) {
-            return rook_moves(board, myPosition);
-        }
-        // queen
-        else if (type.equals(PieceType.QUEEN)) {
-            return rook_moves(board, myPosition);
-        }
-        // king
-        else if (type.equals(PieceType.KING)) {
-            return rook_moves(board, myPosition);
-        }
+//        int r = myPosition.getRow();
+//        int c = myPosition.getColumn();
+//        PieceType type = board.getPiece(myPosition).getPieceType();
+//        // pawn
+//        if (type.equals(PieceType.PAWN)) {
+//        return pawn_moves(board, myPosition);}
+//        // rook
+//        else if (type.equals(PieceType.ROOK)) {
+//            return rook_moves(board, myPosition);
+//        }
+//        // knight
+//        else if (type.equals(PieceType.KNIGHT)) {
+//            return rook_moves(board, myPosition);
+//        }
+//        // bishop
+//        else if (type.equals(PieceType.BISHOP)) {
+//            return rook_moves(board, myPosition);
+//        }
+//        // queen
+//        else if (type.equals(PieceType.QUEEN)) {
+//            return rook_moves(board, myPosition);
+//        }
+//        // king
+//        else if (type.equals(PieceType.KING)) {
+//            return rook_moves(board, myPosition);
+//        }
         throw new RuntimeException("Not implemented");
     }
 
-    public Collection<ChessMove> pawn_moves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> valid_moves = new ArrayList<>();
-        return valid_moves;
-    }
-    public Collection<ChessMove> rook_moves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> valid_moves;
-
-        return valid_moves;
-    }
-    public Collection<ChessMove> knight_moves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> valid_moves;
-
-        return valid_moves;
-    }
-    public Collection<ChessMove> bishop_moves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> valid_moves;
-
-        return valid_moves;
-    }
-    public Collection<ChessMove> queen_moves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> valid_moves;
-
-        return valid_moves;
-    }
-    public Collection<ChessMove> king_moves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> valid_moves;
-
-        return valid_moves;
-    }
+//    public Collection<ChessMove> pawn_moves(ChessBoard board, ChessPosition myPosition) {
+//        Collection<ChessMove> valid_moves = new ArrayList<>();
+//        return valid_moves;
+//    }
+//    public Collection<ChessMove> rook_moves(ChessBoard board, ChessPosition myPosition) {
+//        Collection<ChessMove> valid_moves;
+//
+//        return valid_moves;
+//    }
+//    public Collection<ChessMove> knight_moves(ChessBoard board, ChessPosition myPosition) {
+//        Collection<ChessMove> valid_moves;
+//
+//        return valid_moves;
+//    }
+//    public Collection<ChessMove> bishop_moves(ChessBoard board, ChessPosition myPosition) {
+//        Collection<ChessMove> valid_moves;
+//
+//        return valid_moves;
+//    }
+//    public Collection<ChessMove> queen_moves(ChessBoard board, ChessPosition myPosition) {
+//        Collection<ChessMove> valid_moves;
+//
+//        return valid_moves;
+//    }
+//    public Collection<ChessMove> king_moves(ChessBoard board, ChessPosition myPosition) {
+//        Collection<ChessMove> valid_moves;
+//
+//        return valid_moves;
+//    }
 }
