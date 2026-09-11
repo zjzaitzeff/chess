@@ -50,4 +50,8 @@ public class ChessMove {
     public int hashCode() {
         return Objects.hash(sp, ep, promotion_type);
     }
+    @Override
+    public String toString() {
+        return String.format("startpos: %s endpos: %s promotion_type: %s", sp,ep,promotion_type);
+    }
 }
