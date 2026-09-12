@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -53,7 +54,18 @@ public class ChessGame {
         if (p == null) {
             return null;
         }
-        return p.pieceMoves(the_board, startPosition);
+        Collection<ChessMove> possible_moves = p.pieceMoves(the_board, startPosition);
+        Collection<ChessMove> valid_moves = new ArrayList<>();
+        for (ChessMove move : possible_moves) {
+            ChessBoard dummy_board = the_board.copy_board();
+            the_board.addPiece(move.getEndPosition(), the_board.getPiece(startPosition));
+            the_board.addPiece(move.getStartPosition(), null);
+            if (!isInCheck(p.getTeamColor())) {
+                valid_moves.add(move);
+            }
+            the_board = dummy_board.copy_board();
+        }
+        return valid_moves;
     }
 
     /**
@@ -85,7 +97,8 @@ public class ChessGame {
         for (int i=1;i<9;i++) {
             for (int j=1; j<9;j++) {
                 ChessPosition current_position = new ChessPosition(i,j);
-                if (ChessPiece.PieceType.KING.equals(the_board.getPiece(current_position).getPieceType()) && teamColor.equals(the_board.getPiece(current_position).getTeamColor())) {
+                ChessPiece p = the_board.getPiece(current_position);
+                if (p != null && p.getPieceType() == ChessPiece.PieceType.KING && p.getTeamColor() == teamColor) {
                     king_position = current_position;
                 }
             }
@@ -95,7 +108,7 @@ public class ChessGame {
                 ChessPosition current_position = new ChessPosition(i,j);
                 ChessPiece p = the_board.getPiece(current_position);
                 if (!teamColor.equals(p.getTeamColor())) {
-                    Collection<ChessMove> moves = validMoves(current_position);
+                    Collection<ChessMove> moves = p.pieceMoves(the_board, current_position);
                     for (ChessMove move : moves) {
                         if (move.getEndPosition().equals(king_position)) {
                             return true;
@@ -133,6 +146,7 @@ public class ChessGame {
                                 the_board = old_board.copy_board();
                                 return false;
                             }
+                            the_board = old_board.copy_board();
                         }
                     }
                     }
@@ -170,6 +184,7 @@ public class ChessGame {
                                     return false;
                                 }
                             }
+                            the_board = old_board.copy_board();
                         }
                     }
                 }
