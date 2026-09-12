@@ -71,6 +71,17 @@ public class ChessBoard {
         addPiece(new ChessPosition(8,7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
         addPiece(new ChessPosition(8,8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
     }
+    public ChessBoard copy_board() {
+        ChessBoard new_board = new ChessBoard();
+        for (int i = 1; i<9;i++) {
+            for (int j=1;j<9;j++) {
+                ChessPosition current_position = new ChessPosition(i,j);
+                ChessPiece p = getPiece(current_position);
+                new_board.addPiece(current_position, p);
+            }
+        }
+        return new_board;
+    }
 
     @Override
     public boolean equals(Object o) {
