@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -149,7 +150,32 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            for (int i = 1; i < 9; i++) {
+                for (int j = 1; j < 9; j++) {
+                    ChessPosition current_position = new ChessPosition(i, j);
+                    ChessPiece p = the_board.getPiece(current_position);
+                    if (teamColor.equals(p.getTeamColor())) {
+                        Collection<ChessMove> moves = validMoves(current_position);
+                        for (ChessMove move : moves) {
+                            ChessBoard old_board = the_board.copy_board();
+                            ChessPosition sp = move.getStartPosition();
+                            ChessPosition ep = move.getEndPosition();
+                            Collection<ChessMove> valid_moves = validMoves(sp);
+                            if (valid_moves.contains(move)) {
+                                the_board.addPiece(ep, the_board.getPiece(sp));
+                                the_board.addPiece(sp, null);
+                                if (!isInCheck(teamColor)) {
+                                    the_board = old_board.copy_board();
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    return true;
     }
 
     /**
@@ -158,7 +184,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        the_board = board;
+        the_board = board.copy_board();
     }
 
     /**
@@ -168,5 +194,27 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return the_board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return whose_turn == chessGame.whose_turn && Objects.equals(the_board, chessGame.the_board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(whose_turn, the_board);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "whose_turn=" + whose_turn +
+                ", the_board=" + the_board +
+                '}';
     }
 }
