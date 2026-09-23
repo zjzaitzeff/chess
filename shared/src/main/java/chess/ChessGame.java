@@ -92,8 +92,11 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition sp = move.getStartPosition();
-        ChessPosition ep = move.getStartPosition();
+        ChessPosition ep = move.getEndPosition();
         ChessPiece.PieceType promotion = move.getPromotionPiece();
+        if (the_board.getPiece(sp) == null) {
+            throw new InvalidMoveException("Invalid move");
+        }
         if (!whose_turn.equals(the_board.getPiece(sp).getTeamColor())) {
             throw new InvalidMoveException("Invalid move, not your turn");
         }
