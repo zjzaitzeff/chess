@@ -167,28 +167,21 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) {
-            for (int i = 1; i < 9; i++) {
-                for (int j = 1; j < 9; j++) {
-                    ChessPosition current_position = new ChessPosition(i, j);
-                    ChessPiece p = the_board.getPiece(current_position);
-                    if (teamColor.equals(p.getTeamColor())) {
-                        Collection<ChessMove> moves = validMoves(current_position);
-                        for (ChessMove move : moves) {
-                            ChessBoard old_board = the_board.copy_board();
-                            ChessPosition sp = move.getStartPosition();
-                            ChessPosition ep = move.getEndPosition();
-                            Collection<ChessMove> valid_moves = validMoves(sp);
-                            if (valid_moves.contains(move)) {
-                                the_board.addPiece(ep, the_board.getPiece(sp));
-                                the_board.addPiece(sp, null);
-                            if (!isInCheck(teamColor)) {
-                                the_board = old_board.copy_board();
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+        for (int i=1; i < 9; i++) {
+            for (int j=1; j < 9; j++) {
+                ChessPosition current_position = new ChessPosition(i,j);
+                ChessPiece p = the_board.getPiece(current_position);
+                if (p!=null) {
+                    if (p.getTeamColor().equals(teamColor)) {
+                        Collection<ChessMove> vm = validMoves(current_position);
+                        if (vm != null) {
+                            if (!vm.isEmpty()) {
                                 return false;
                             }
-                            the_board = old_board.copy_board();
                         }
-                    }
                     }
                 }
             }
