@@ -50,22 +50,22 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece p = the_board.getPiece(startPosition);
+        Collection<ChessMove> vm = new ArrayList<>();
+        ChessPiece p = the_board.getPiece((startPosition));
         if (p == null) {
             return null;
-        }
-        Collection<ChessMove> possible_moves = p.pieceMoves(the_board, startPosition);
-        Collection<ChessMove> valid_moves = new ArrayList<>();
-        for (ChessMove move : possible_moves) {
-            ChessBoard dummy_board = the_board.copy_board();
-            the_board.addPiece(move.getEndPosition(), the_board.getPiece(startPosition));
-            the_board.addPiece(move.getStartPosition(), null);
-            if (!isInCheck(p.getTeamColor())) {
-                valid_moves.add(move);
+        } else {
+            Collection<ChessMove> p_moves = p.pieceMoves(the_board, startPosition);
+            for (ChessMove m : p_moves) {
+                ChessPiece target_piece = the_board.getPiece(m.getEndPosition());
+                if (target_piece == null) {
+                    vm.add(m);
+                } else if (!target_piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
+                    vm.add(m);
+                }
             }
-            the_board = dummy_board.copy_board();
         }
-        return valid_moves;
+        return vm;
     }
 
     /**
@@ -76,13 +76,32 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition sp = move.getStartPosition();
-        ChessPosition ep = move.getEndPosition();
-        Collection<ChessMove> happy_go_lucky = validMoves(sp);
-        if (happy_go_lucky.contains(move)) {
-            the_board.addPiece(ep, the_board.getPiece(sp));
-            the_board.addPiece(sp, null);
+        ChessPosition ep = move.getStartPosition();
+        ChessPiece.PieceType promotion = move.getPromotionPiece();
+        if (!whose_turn.equals(the_board.getPiece(sp).getTeamColor())) {
+            throw new InvalidMoveException("Invalid move, not your turn");
+        }
+        Collection<ChessMove> valid_moves = validMoves(sp);
+        if (valid_moves == null) {
+            throw new InvalidMoveException("No piece at that start location");
+        }
+        if (valid_moves.contains(move)) {
+            if (promotion != null) {
+                the_board.addPiece(ep, new ChessPiece(the_board.getPiece(sp).getTeamColor(), promotion));
+                the_board.addPiece(sp, null);
+            } else {
+                the_board.addPiece(ep, the_board.getPiece(sp));
+                the_board.addPiece(sp,null);
+            }
         } else {
             throw new InvalidMoveException("Invalid move" + move);
+        }
+
+        //change turn
+        if (whose_turn.equals(TeamColor.WHITE)) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
         }
     }
 
