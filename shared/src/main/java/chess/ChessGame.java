@@ -59,9 +59,25 @@ public class ChessGame {
             for (ChessMove m : p_moves) {
                 ChessPiece target_piece = the_board.getPiece(m.getEndPosition());
                 if (target_piece == null) {
-                    vm.add(m);
+                    ChessPosition sp = m.getStartPosition();
+                    ChessPosition ep = m.getEndPosition();
+                    the_board.addPiece(ep, p);
+                    the_board.addPiece(sp, null);
+                    if (!isInCheck(p.getTeamColor())) {
+                        vm.add(m);
+                    }
+                    the_board.addPiece(sp,p);
+                    the_board.addPiece(ep,target_piece);
                 } else if (!target_piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
-                    vm.add(m);
+                    ChessPosition sp = m.getStartPosition();
+                    ChessPosition ep = m.getEndPosition();
+                    the_board.addPiece(ep, p);
+                    the_board.addPiece(sp, null);
+                    if (!isInCheck(p.getTeamColor())) {
+                        vm.add(m);
+                    }
+                    the_board.addPiece(sp,p);
+                    the_board.addPiece(ep,target_piece);
                 }
             }
         }
@@ -124,13 +140,15 @@ public class ChessGame {
         }
         for (int i=1;i<9;i++) {
             for (int j=1;j<9;j++) {
-                ChessPosition current_position = new ChessPosition(i,j);
+                ChessPosition current_position = new ChessPosition(i, j);
                 ChessPiece p = the_board.getPiece(current_position);
-                if (!teamColor.equals(p.getTeamColor())) {
-                    Collection<ChessMove> moves = p.pieceMoves(the_board, current_position);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(king_position)) {
-                            return true;
+                if (p != null) {
+                    if (!teamColor.equals(p.getTeamColor())) {
+                        Collection<ChessMove> moves = p.pieceMoves(the_board, current_position);
+                        for (ChessMove move : moves) {
+                            if (move.getEndPosition().equals(king_position)) {
+                                return true;
+                            }
                         }
                     }
                 }
