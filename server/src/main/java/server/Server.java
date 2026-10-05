@@ -1,5 +1,5 @@
 package server;
-
+import java.util.UUID;
 import io.javalin.*;
 
 public class Server {
@@ -11,6 +11,9 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
 
+    }
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 
     public int run(int desiredPort) {
