@@ -2,10 +2,6 @@ package service;
 import dataaccess.*;
 import model.UserData;
 import model.AuthData;
-import org.junit.jupiter.api.Test;
-import server.Server;
-import server.ServerMain;
-
 import java.util.UUID;
 
 public class UserService {
@@ -37,7 +33,7 @@ public class UserService {
         String authTokenID = generateToken();
         AuthData authToken = new AuthData(authTokenID, username);
         authTokens.createAuth(authToken);
-        return new RegisterResult(username, authToken);
+        return new RegisterResult(username, authTokenID);
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
@@ -52,14 +48,13 @@ public class UserService {
         String authTokenID = generateToken();
         AuthData authToken = new AuthData(authTokenID, username);
         authTokens.createAuth(authToken);
-        return new LoginResult(username, authToken);
+        return new LoginResult(username, authTokenID);
     }
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
-        String authTokenID = logoutRequest.authToken().authToken();
-        AuthData authToken = logoutRequest.authToken();
-        //400 unauthorized
-        if (!authToken.equals(authTokens.getAuth(authTokenID))) {
-            throw new UnauthorizedException("Error 400: Unauthorized");
+        String authTokenID = logoutRequest.authToken();
+        //401 unauthorized
+        if (authTokenID == null || authTokens.getAuth(authTokenID) == null) {
+            throw new UnauthorizedException("Error 401: Unauthorized");
         }
         authTokens.deleteAuth(authTokenID);
         return new LogoutResult();

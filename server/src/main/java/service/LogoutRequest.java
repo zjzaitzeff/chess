@@ -1,4 +1,4 @@
 package service;
 import model.AuthData;
-public record LogoutRequest(AuthData authToken) {
+public record LogoutRequest(String authToken) {
 }
