@@ -1,11 +1,37 @@
 package service;
-import dataaccess.UserDAO;
-import dataaccess.MemUserDAO;
+import dataaccess.*;
+import org.junit.jupiter.api.Test;
 import server.Server;
 import server.ServerMain;
 
+import java.util.UUID;
+
 public class UserService {
-    public RegisterResult register(RegisterRequest registerRequest) {}
+    private final UserDAO users;
+    private final AuthDAO authTokens;
+    public UserService(UserDAO userList, AuthDAO authTokenList) {
+        this.users = userList;
+        this.authTokens = authTokenList;
+    }
+    private static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
+        String username = registerRequest.username();
+        String password = registerRequest.password();
+        String email = registerRequest.email();
+        // 400 bad request
+        if (username == null || password == null || email == null || username.isEmpty() || password.isEmpty() || email.isEmpty()) {
+            throw new BadRequestException("Error 400: Bad Request");
+        }
+        // 403 already taken
+        if (users.getUser(username) != null) {
+            throw new AlreadyTakenException("Error 403: Already Taken");
+        }
+        // 500 error
+        // 200 success
+    }
+
     public LoginResult login(LoginRequest loginRequest) {}
     public void logout(LogoutRequest logoutRequest) {}
 }

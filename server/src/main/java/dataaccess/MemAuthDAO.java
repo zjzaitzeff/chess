@@ -4,5 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemAuthDAO {
-    private final Map<String, AuthData> users = new HashMap<>();
+    private final Map<String, AuthData> authTokens = new HashMap<>();
+    public void createAuth(AuthData a) {
+        authTokens.put(a.username(), a);
+    }
+    public void deleteAuth(String username) {
+        authTokens.remove(username);
+    }
+    public AuthData getAuth(AuthData a) {
+        return authTokens.get(a.username());
+    }
+    public void updateAuth(AuthData a) {
+        authTokens.put(a.username(), a);
+    }
+    public void clear() {
+        authTokens.clear();
+    }
 }
