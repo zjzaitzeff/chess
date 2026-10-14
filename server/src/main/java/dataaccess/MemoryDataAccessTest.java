@@ -1,9 +1,15 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +76,7 @@ public class MemoryDataAccessTest {
         var authTokenTwo = new AuthData("9876", "cow");
         var d = new MemAuthDAO();
         d.createAuth(authTokenOne);
-        d.updateAuth(authTokenTwo);
+        d.updateAuth("cow",authTokenTwo);
         assertNotEquals(authTokenOne, d.getAuth(authTokenTwo.username()));
     }
     @Test
@@ -85,5 +91,56 @@ public class MemoryDataAccessTest {
         assertNull(d.getAuth(authTokenOne.username()));
         assertNull(d.getAuth(authTokenTwo.username()));
     }
-
+    GameData generateAndAddGame(MemGameDAO d) {
+        var game = new GameData(1234, "cow", "cyote", "name", new ChessGame());
+        d.createGame(game);
+        return game;
+    }
+    // createGame, getGame, deleteGame, updateGame, listGames, clear
+    @Test
+    @DisplayName("Create Game")
+    public void createGame() {
+        var d = new MemGameDAO();
+        var game = generateAndAddGame(d);
+        assertNotNull(d.getGame(game.gameID()));
+    }
+    @Test
+    @DisplayName("Get Game")
+    public void getGame() {
+        var d = new MemGameDAO();
+        var game = generateAndAddGame(d);
+        assertEquals(game, d.getGame(game.gameID()));
+    }
+    @Test
+    @DisplayName("delete Game")
+    public void deleteGame() {
+        var d = new MemGameDAO();
+        var game = generateAndAddGame(d);
+        assertNotNull(d.getGame(game.gameID()));
+        d.deleteGame(game.gameID());
+        assertNull(d.getGame(game.gameID()));
+    }
+    @Test
+    @DisplayName("Update Game")
+    public void updateGame() {
+        var d = new MemGameDAO();
+        var game = generateAndAddGame(d);
+        var gameTwo = new GameData(5678, "white", "black", "game2", new ChessGame());
+        d.createGame(gameTwo);
+        d.updateGame(game.gameID(), gameTwo);
+        assertEquals(d.getGame(game.gameID()), d.getGame(gameTwo.gameID()));
+    }
+    @Test
+    @DisplayName("List Games")
+    public void listGames() {
+        var d = new MemGameDAO();
+        var g1 = generateAndAddGame(d);
+        var g2 = new GameData(5678, "white", "black", "game2", new ChessGame());
+        var g3 = new GameData(9012, "whiter", "blacker", "game3", new ChessGame());
+        d.createGame(g2);
+        d.createGame(g3);
+        Collection<GameData> compare = new HashSet<>(d.listGames());
+        Collection<GameData> games = Set.of(g1, g2, g3);
+        assertEquals(games, compare);
+    }
 }

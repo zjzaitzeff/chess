@@ -10,14 +10,14 @@ public class MemGameDAO {
     public void createGame(GameData g) {
         games.put(g.gameID(),g);
     }
-    public GameData getGame(GameData g) {
-        return games.get(g.gameID());
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
     }
-    public void deleteGame(GameData g) {
-        games.remove(g.gameID());
+    public void deleteGame(int gameID) {
+        games.remove(gameID);
     }
-    public void updateGame(GameData g) {
-        games.put(g.gameID(), g);
+    public void updateGame(int gameID, GameData g) {
+        games.put(gameID, g);
     }
     public Collection<GameData> listGames() {
         return games.values();

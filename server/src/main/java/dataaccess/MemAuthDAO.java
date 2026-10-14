@@ -14,8 +14,8 @@ public class MemAuthDAO {
     public AuthData getAuth(String username) {
         return authTokens.get(username);
     }
-    public void updateAuth(AuthData a) {
-        authTokens.put(a.username(), a);
+    public void updateAuth(String username, AuthData a) {
+        authTokens.put(username, a);
     }
     public void clear() {
         authTokens.clear();

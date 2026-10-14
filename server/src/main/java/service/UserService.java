@@ -40,6 +40,6 @@ public class UserService {
         return new RegisterResult(username, authTokenID);
     }
 
-    public LoginResult login(LoginRequest loginRequest) {}
+    //public LoginResult login(LoginRequest loginRequest) {}
     public void logout(LogoutRequest logoutRequest) {}
 }
