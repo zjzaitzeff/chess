@@ -39,13 +39,13 @@ public class GameService {
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
         String gameName = createGameRequest.gameName();
-        AuthData authToken = createGameRequest.authToken();
+        String authToken = createGameRequest.authToken();
         // 400 bad request
         if (gameName == null || gameName.isEmpty()) {
             throw new BadRequestException("Error 400: Bad Request");
         }
         // 401 unauthorized
-        if (authTokens.getAuth(authToken.authToken()) == null) {
+        if (authTokens.getAuth(authToken) == null || authToken == null) {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
         //GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game)
@@ -55,7 +55,7 @@ public class GameService {
         return new CreateGameResult(gameID);
     }
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
-        AuthData authToken = joinGameRequest.authToken();
+        String authToken = joinGameRequest.authToken();
         String playerColor = joinGameRequest.playerColor();
         int gameID = joinGameRequest.gameID();
         //400 bad request
@@ -63,7 +63,7 @@ public class GameService {
             throw new BadRequestException("Error 400: Bad Request");
         }
         //401 unauthorized
-        if (authTokens.getAuth(authToken.authToken()) == null) {
+        if (authTokens.getAuth(authToken) == null || authToken == null) {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
         //403 already taken
@@ -78,7 +78,7 @@ public class GameService {
             }
         }
         //200
-        String username = authToken.username();
+        String username = authTokens.getAuth(authToken).username();
         if (playerColor.equals("WHITE")) {
             GameData updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.chess());
             games.updateGame(gameID, updatedGame);

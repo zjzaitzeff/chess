@@ -1,4 +1,4 @@
 package service;
 import model.AuthData;
-public record CreateGameRequest(AuthData authToken, String gameName) {
+public record CreateGameRequest(String authToken, String gameName) {
 }

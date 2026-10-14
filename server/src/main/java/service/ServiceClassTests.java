@@ -141,5 +141,39 @@ public class ServiceClassTests {
         ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
         assertEquals(listGamesResult.games(), gameDAO.listGames());
     }
+    @Test
+    @DisplayName("Create Game Bad Request")
+    public void createGameBadRequest() throws DataAccessException {
+        GameDAO gameDAO = new MemGameDAO();
+        AuthDAO authDAO = new MemAuthDAO();
+        GameService gameService = new GameService(gameDAO, authDAO);
+        CreateGameRequest createGameRequest = new CreateGameRequest(null, "");
+        Assertions.assertThrows(BadRequestException.class, () -> {
+            gameService.createGame(createGameRequest);
+        });
+    }
+    @Test
+    @DisplayName("Create Game Unauthorized")
+    public void createGameUnauthorized() throws DataAccessException {
+        GameDAO gameDAO = new MemGameDAO();
+        AuthDAO authDAO = new MemAuthDAO();
+        GameService gameService = new GameService(gameDAO, authDAO);
+        CreateGameRequest createGameRequest = new CreateGameRequest("Evil cow", "Revenge of the Cows");
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> gameService.createGame(createGameRequest));
+        assertEquals("Error 401: Unauthorized", exception.getMessage());
+        CreateGameRequest createGamesRequestTwo = new CreateGameRequest(null, "Cow");
+        assertThrows(UnauthorizedException.class, () -> gameService.createGame(createGamesRequestTwo));
+    }
+    @Test
+    @DisplayName("Create Game Success")
+    public void createGameSuccess() throws DataAccessException {
+        GameDAO gameDAO = new MemGameDAO();
+        AuthDAO authDAO = new MemAuthDAO();
+        authDAO.createAuth(new AuthData("Evil cow", "Cow"));
+        GameService gameService = new GameService(gameDAO, authDAO);
+        CreateGameRequest createGameRequest = new CreateGameRequest("Evil cow", "Revenge of the Cows");
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        assertNotNull(createGameResult);
+    }
 
 }
