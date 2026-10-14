@@ -49,7 +49,7 @@ public class MemoryDataAccessTest {
         var authToken = new AuthData("01234", "cow");
         var d = new MemAuthDAO();
         d.createAuth(authToken);
-        assertNotNull(d.getAuth(authToken.username()));
+        assertNotNull(d.getAuth(authToken.authToken()));
     }
     @Test
     @DisplayName("Get auth")
@@ -57,7 +57,7 @@ public class MemoryDataAccessTest {
         var authToken = new AuthData("01234", "cow");
         var d = new MemAuthDAO();
         d.createAuth(authToken);
-        assertEquals(authToken, d.getAuth(authToken.username()));
+        assertEquals(authToken, d.getAuth(authToken.authToken()));
     }
     @Test
     @DisplayName("Delete auth")
@@ -65,19 +65,19 @@ public class MemoryDataAccessTest {
         var authToken = new AuthData("01234", "cow");
         var d = new MemAuthDAO();
         d.createAuth(authToken);
-        assertNotNull(d.getAuth(authToken.username()));
-        d.deleteAuth(authToken.username());
-        assertNull(d.getAuth(authToken.username()));
+        assertNotNull(d.getAuth(authToken.authToken()));
+        d.deleteAuth(authToken.authToken());
+        assertNull(d.getAuth(authToken.authToken()));
     }
     @Test
     @DisplayName("Update auth")
     public void updateAuth() {
         var authTokenOne = new AuthData("01234", "cow");
-        var authTokenTwo = new AuthData("9876", "cow");
+        var authTokenTwo = new AuthData("9876", "moo");
         var d = new MemAuthDAO();
         d.createAuth(authTokenOne);
-        d.updateAuth("cow",authTokenTwo);
-        assertNotEquals(authTokenOne, d.getAuth(authTokenTwo.username()));
+        d.updateAuth("01234",authTokenTwo);
+        assertNotEquals(authTokenOne, d.getAuth(authTokenTwo.authToken()));
     }
     @Test
     @DisplayName("Clear auth")
@@ -88,8 +88,8 @@ public class MemoryDataAccessTest {
         d.createAuth(authTokenOne);
         d.createAuth(authTokenTwo);
         d.clear();
-        assertNull(d.getAuth(authTokenOne.username()));
-        assertNull(d.getAuth(authTokenTwo.username()));
+        assertNull(d.getAuth(authTokenOne.authToken()));
+        assertNull(d.getAuth(authTokenTwo.authToken()));
     }
     GameData generateAndAddGame(MemGameDAO d) {
         var game = new GameData(1234, "cow", "cyote", "name", new ChessGame());

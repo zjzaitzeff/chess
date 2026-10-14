@@ -6,16 +6,16 @@ import java.util.Map;
 public class MemAuthDAO {
     private final Map<String, AuthData> authTokens = new HashMap<>();
     public void createAuth(AuthData a) {
-        authTokens.put(a.username(), a);
+        authTokens.put(a.authToken(), a);
     }
-    public void deleteAuth(String username) {
-        authTokens.remove(username);
+    public void deleteAuth(String authToken) {
+        authTokens.remove(authToken);
     }
-    public AuthData getAuth(String username) {
-        return authTokens.get(username);
+    public AuthData getAuth(String authToken) {
+        return authTokens.get(authToken);
     }
-    public void updateAuth(String username, AuthData a) {
-        authTokens.put(username, a);
+    public void updateAuth(String authToken, AuthData a) {
+        authTokens.put(authToken, a);
     }
     public void clear() {
         authTokens.clear();

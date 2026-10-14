@@ -55,13 +55,13 @@ public class UserService {
         return new LoginResult(username, authToken);
     }
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
-        String username = logoutRequest.authToken().username();
+        String authTokenID = logoutRequest.authToken().authToken();
         AuthData authToken = logoutRequest.authToken();
         //400 unauthorized
-        if (!authToken.equals(authTokens.getAuth(username))) {
+        if (!authToken.equals(authTokens.getAuth(authTokenID))) {
             throw new UnauthorizedException("Error 400: Unauthorized");
         }
-        authTokens.deleteAuth(username);
+        authTokens.deleteAuth(authTokenID);
         return new LogoutResult();
     }
 }

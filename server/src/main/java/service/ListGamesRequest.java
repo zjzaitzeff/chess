@@ -1,4 +1,4 @@
 package service;
-
-public record ListGamesRequest(String authToken) {
+import model.AuthData;
+public record ListGamesRequest(AuthData authToken) {
 }
