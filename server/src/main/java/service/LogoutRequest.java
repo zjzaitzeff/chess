@@ -1,4 +1,4 @@
 package service;
-
-public record LogoutRequest(String authToken) {
+import model.AuthData;
+public record LogoutRequest(AuthData authToken) {
 }

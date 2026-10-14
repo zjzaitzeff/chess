@@ -37,7 +37,7 @@ public class UserService {
         String authTokenID = generateToken();
         AuthData authToken = new AuthData(authTokenID, username);
         authTokens.createAuth(authToken);
-        return new RegisterResult(username, authTokenID);
+        return new RegisterResult(username, authToken);
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
@@ -52,7 +52,16 @@ public class UserService {
         String authTokenID = generateToken();
         AuthData authToken = new AuthData(authTokenID, username);
         authTokens.createAuth(authToken);
-        return new LoginResult(username, authTokenID);
+        return new LoginResult(username, authToken);
     }
-    public void logout(LogoutRequest logoutRequest) {}
+    public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
+        String username = logoutRequest.authToken().username();
+        AuthData authToken = logoutRequest.authToken();
+        //400 unauthorized
+        if (!authToken.equals(authTokens.getAuth(username))) {
+            throw new UnauthorizedException("Error 400: Unauthorized");
+        }
+        authTokens.deleteAuth(username);
+        return new LogoutResult();
+    }
 }

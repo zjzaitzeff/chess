@@ -1,4 +1,4 @@
 package service;
-
-public record RegisterResult(String username, String authToken) {
+import model.AuthData;
+public record RegisterResult(String username, AuthData authToken) {
 }
