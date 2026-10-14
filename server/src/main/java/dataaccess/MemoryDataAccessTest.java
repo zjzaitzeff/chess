@@ -4,31 +4,37 @@ import model.UserData;
 import model.AuthData;
 import model.GameData;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class MemoryDataAccessTest {
-    UserData registerRandomUser() {
+    UserData registerRandomUser(MemUserDAO d) {
         var user = new UserData("cow", "cow@byu.edu", "moo");
-        var d = new MemUserDAO();
         d.createUser(user);
         return d.getUser(user.username());
     }
     @Test
+    @DisplayName("Clear")
     public void clear() {
-        var d = new Use();
-        var user = registerRandomUser();
+        var d = new MemUserDAO();
+        var user = registerRandomUser(d);
         assertNotNull(d.getUser(user.username()));
         d.clear();
         assertNull(d.getUser(user.username()));
-
-
     }
     @Test
-    public void registerAndGetUser() {
-        var user = new UserData("cow", "cow@byu.edu", "moo");
-        var d = new MemoryDataAcces();
-        d.register(user, null);
-        car actualUser = d.getUser(user.username());
-        assertEquals(user.username(), actualUser.username());
+    @DisplayName("Create user")
+    public void createUser() {
+        var d = new MemUserDAO();
+        var user = registerRandomUser(d);
+        assertNotNull(d.getUser(user.username()));
+    }
+    @Test
+    @DisplayName("Get user")
+    public void getUser() {
+        var d = new MemUserDAO();
+        var user = registerRandomUser(d);
+        assertEquals(user, d.getUser(user.username()));
     }
 }
