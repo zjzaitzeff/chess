@@ -1,5 +1,7 @@
 package service;
 import dataaccess.*;
+import model.UserData;
+import model.AuthData;
 import org.junit.jupiter.api.Test;
 import server.Server;
 import server.ServerMain;
@@ -16,6 +18,7 @@ public class UserService {
     private static String generateToken() {
         return UUID.randomUUID().toString();
     }
+
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String password = registerRequest.password();
@@ -28,8 +31,13 @@ public class UserService {
         if (users.getUser(username) != null) {
             throw new AlreadyTakenException("Error 403: Already Taken");
         }
-        // 500 error
         // 200 success
+        UserData user = new UserData(username, password, email);
+        users.createUser(user);
+        String authTokenID = generateToken();
+        AuthData authToken = new AuthData(authTokenID, username);
+        authTokens.createAuth(authToken);
+        return new RegisterResult(username, authTokenID);
     }
 
     public LoginResult login(LoginRequest loginRequest) {}
