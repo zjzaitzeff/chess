@@ -28,9 +28,9 @@ public class GameService {
    }
 // listGames, createGame, joinGame
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException {
-        AuthData authToken = listGamesRequest.authToken();
+        String authToken = listGamesRequest.authToken();
         //401 unauthorized
-        if (authTokens.getAuth(authToken.authToken()) == null) {
+        if (authTokens.getAuth(authToken) == null || authToken == null) {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
         Collection<GameData> gameList = games.listGames();

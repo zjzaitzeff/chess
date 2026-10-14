@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -114,4 +117,29 @@ public class ServiceClassTests {
         LogoutResult logoutResult = userService.logout(new LogoutRequest(loginResult.authToken()));
         assertNull(authDAO.getAuth(loginResult.authToken()));
     }
+    @Test
+    @DisplayName("List Games Unauthorized")
+    public void listGamesUnauthorized() throws DataAccessException {
+        GameDAO gameDAO = new MemGameDAO();
+        AuthDAO authDAO = new MemAuthDAO();
+        GameService gameService = new GameService(gameDAO, authDAO);
+        ListGamesRequest listGamesRequest = new ListGamesRequest("Evil cow");
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> gameService.listGames(listGamesRequest));
+        assertEquals("Error 401: Unauthorized", exception.getMessage());
+        ListGamesRequest listGamesRequestTwo = new ListGamesRequest(null);
+        assertThrows(UnauthorizedException.class, () -> gameService.listGames(listGamesRequestTwo));
+    }
+    @Test
+    @DisplayName("List Games Success")
+    public void listGamesSuccess() throws DataAccessException {
+        GameDAO gameDAO = new MemGameDAO();
+        AuthDAO authDAO = new MemAuthDAO();
+        authDAO.createAuth(new AuthData("0987", "Cow"));
+        gameDAO.createGame(new GameData(0, "Cow", "Duck", "Go Read A Book", new ChessGame()));
+        GameService gameService = new GameService(gameDAO, authDAO);
+        ListGamesRequest listGamesRequest = new ListGamesRequest("0987");
+        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+        assertEquals(listGamesResult.games(), gameDAO.listGames());
+    }
+
 }
