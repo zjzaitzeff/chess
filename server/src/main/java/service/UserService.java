@@ -40,6 +40,19 @@ public class UserService {
         return new RegisterResult(username, authTokenID);
     }
 
-    //public LoginResult login(LoginRequest loginRequest) {}
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        String username = loginRequest.username();
+        String password = loginRequest.password();
+        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+            throw new BadRequestException("Error 400: Bad Request");
+        }
+        if (!password.equals(users.getUser(username).password())) {
+            throw new UnauthorizedException("Error 401: Unauthorized");
+        }
+        String authTokenID = generateToken();
+        AuthData authToken = new AuthData(authTokenID, username);
+        authTokens.createAuth(authToken);
+        return new LoginResult(username, authTokenID);
+    }
     public void logout(LogoutRequest logoutRequest) {}
 }
