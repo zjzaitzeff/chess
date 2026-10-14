@@ -11,8 +11,8 @@ public class MemAuthDAO {
     public void deleteAuth(String username) {
         authTokens.remove(username);
     }
-    public AuthData getAuth(AuthData a) {
-        return authTokens.get(a.username());
+    public AuthData getAuth(String username) {
+        return authTokens.get(username);
     }
     public void updateAuth(AuthData a) {
         authTokens.put(a.username(), a);
