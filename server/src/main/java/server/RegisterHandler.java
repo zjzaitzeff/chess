@@ -20,8 +20,8 @@ public class RegisterHandler implements Handler {
         context.contentType("application/json");
         try {
             var jsonInfo = context.body();
-            RegisterRequest registerRequest = serializer.fromJson(jsonInfo, RegisterRequest.class);
-            RegisterResult registerResult = userService.register(registerRequest);
+            UserService.RegisterRequest registerRequest = serializer.fromJson(jsonInfo, UserService.RegisterRequest.class);
+            UserService.RegisterResult registerResult = userService.register(registerRequest);
             var whatToExport = serializer.toJson(registerResult);
             context.status(200).json(whatToExport);
         } catch (BadRequestException exception) {

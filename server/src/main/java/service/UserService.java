@@ -14,7 +14,8 @@ public class UserService {
     private static String generateToken() {
         return UUID.randomUUID().toString();
     }
-
+    public record RegisterResult(String username, String authToken) {}
+    public record RegisterRequest(String username, String password, String email) {}
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String password = registerRequest.password();
