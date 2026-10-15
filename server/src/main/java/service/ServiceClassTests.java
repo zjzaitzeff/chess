@@ -9,6 +9,7 @@ import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
+import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -175,5 +176,22 @@ public class ServiceClassTests {
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);
         assertNotNull(createGameResult);
     }
-
+    @Test
+    @DisplayName("Clear")
+    public void clear() throws DataAccessException {
+        GameDAO gameDAO = new MemGameDAO();
+        AuthDAO authDAO = new MemAuthDAO();
+        UserDAO userDAO = new MemUserDAO();
+        ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
+        gameDAO.createGame(new GameData(5678, "white", "black", "game2", new ChessGame()));
+        authDAO.createAuth(new AuthData("01234", "cow"));
+        userDAO.createUser(new UserData("cow", "cow@byu.edu", "moo"));
+        assertNotNull(gameDAO.getGame(5678));
+        assertNotNull(authDAO.getAuth("01234"));
+        assertNotNull(userDAO.getUser("cow"));
+        ClearResult clearResult = clearService.clear();
+        assertNull(gameDAO.getGame(5678));
+        assertNull(authDAO.getAuth("01234"));
+        assertNull(userDAO.getUser("Cow"));
+    }
 }
