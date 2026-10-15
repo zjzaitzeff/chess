@@ -62,7 +62,7 @@ public class ChessPiece {
         return pawnMoves(board, myPosition,r,c,color);}
         // rook x
         else if (type.equals(PieceType.ROOK)) {
-            return rookMoves(board, myPosition,r,c,color);
+            return rookMoves(board, myPosition,r,c);
         }
         // knight
         else if (type.equals(PieceType.KNIGHT)) {
@@ -178,58 +178,43 @@ public class ChessPiece {
             }
         }
     }
-    public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
+    public boolean rookHelper(int r, int c, ChessPosition targetPosition, ChessBoard board, Collection<ChessMove> validMoves, ChessPosition myPosition) {
+        targetPosition = new ChessPosition(r,c);
+        ChessPiece what_is_at_location = board.getPiece(targetPosition);
+        if (what_is_at_location == null) {
+            validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            return false;
+        } else if (color.equals(what_is_at_location.getTeamColor())) {
+            return true;
+        } else {
+            validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            return true;
+        }
+    }
+    public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, int r, int c) {
         Collection<ChessMove> validMoves = new ArrayList<>();
-        ChessPosition targetPosition;
+        ChessPosition targetPosition = new ChessPosition(0,0);
         // up
         for (int i = r+1; i < 9; i++) {
-            targetPosition = new ChessPosition(i,c);
-            ChessPiece what_is_at_location = board.getPiece(targetPosition);
-            if (what_is_at_location == null) {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
-            } else if (color.equals(what_is_at_location.getTeamColor())) {
-                break;
-            } else {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            if (rookHelper(i, c, targetPosition, board, validMoves, myPosition)) {
                 break;
             }
         }
         // down
         for (int i = r-1; i > 0; i--) {
-            targetPosition = new ChessPosition(i,c);
-            ChessPiece what_is_at_location = board.getPiece(targetPosition);
-            if (what_is_at_location == null) {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
-            } else if (color.equals(what_is_at_location.getTeamColor())) {
-                break;
-            } else {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            if (rookHelper(i, c, targetPosition, board, validMoves, myPosition)) {
                 break;
             }
         }
         // right
         for (int i = c + 1; i < 9; i++) {
-            targetPosition = new ChessPosition(r,i);
-            ChessPiece what_is_at_location = board.getPiece(targetPosition);
-            if (what_is_at_location == null) {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
-            } else if (color.equals(what_is_at_location.getTeamColor())) {
-                break;
-            } else {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            if (rookHelper(r, i, targetPosition, board, validMoves, myPosition)) {
                 break;
             }
         }
         // left
         for (int i = c - 1; i > 0; i--) {
-            targetPosition = new ChessPosition(r,i);
-            ChessPiece what_is_at_location = board.getPiece(targetPosition);
-            if (what_is_at_location == null) {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
-            } else if (color.equals(what_is_at_location.getTeamColor())) {
-                break;
-            } else {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            if (rookHelper(r, i, targetPosition, board, validMoves, myPosition)) {
                 break;
             }
         }
@@ -370,7 +355,7 @@ public class ChessPiece {
     }
     public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> validMoves = new ArrayList<>();
-        Collection<ChessMove> rook_moves = rookMoves(board, myPosition,r,c,color);
+        Collection<ChessMove> rook_moves = rookMoves(board, myPosition,r,c);
         validMoves.addAll(rook_moves);
         Collection<ChessMove> bishop_moves = bishopMoves(board,myPosition,r,c,color);
         validMoves.addAll(bishop_moves);
