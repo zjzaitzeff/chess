@@ -57,8 +57,7 @@ public class GameService {
         return new CreateGameResult(gameID);
     }
 
-    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
-        String authToken = joinGameRequest.authToken();
+    public JoinGameResult joinGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
         String playerColor = joinGameRequest.playerColor();
         int gameID = joinGameRequest.gameID();
         //400 bad request
