@@ -20,9 +20,4 @@ public class MemUserDAO implements UserDAO {
     public void clear() {
         users.clear();
     }
-
-    @Override
-    public void deleteUser(String username) throws DataAccessException {
-        users.remove(username);
-    }
 }
