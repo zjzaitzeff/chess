@@ -19,20 +19,25 @@ public class JoinGameHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
+        var serializer = new Gson();
+        context.contentType("application/json");
         try {
             String authToken = context.header("authorization");
-            JoinGameRequest joinGameRequest = new Gson().fromJson(context.body(), JoinGameRequest.class);
+            var jsonInfo = context.body();
+            JoinGameRequest joinGameRequest = serializer.fromJson(jsonInfo, JoinGameRequest.class);
             JoinGameResult joinGameResult = gameService.joinGame(authToken, joinGameRequest);
-            context.status(200).json(joinGameResult);
+            var whatToExport = serializer.toJson(joinGameResult);
+            context.status(200).json(whatToExport);
         } catch (BadRequestException exception) {
-            context.status(400);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.status(400).result(serializer.toJson(error));
         } catch (UnauthorizedException exception) {
             context.status(401);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.result(serializer.toJson(error));
         } catch (AlreadyTakenException exception) {
-            context.status(403);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.status(403).result(serializer.toJson(error));
         }
     }
 }

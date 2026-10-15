@@ -16,16 +16,20 @@ public class RegisterHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
+        var serializer = new Gson();
+        context.contentType("application/json");
         try {
-            RegisterRequest registerRequest = new Gson().fromJson(context.body(), RegisterRequest.class);
+            var jsonInfo = context.body();
+            RegisterRequest registerRequest = serializer.fromJson(jsonInfo, RegisterRequest.class);
             RegisterResult registerResult = userService.register(registerRequest);
-            context.status(200).json(registerResult);
+            var whatToExport = serializer.toJson(registerResult);
+            context.status(200).json(whatToExport);
         } catch (BadRequestException exception) {
-            context.status(400);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.status(400).result(serializer.toJson(error));
         } catch (AlreadyTakenException exception) {
-            context.status(403);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.status(403).result(serializer.toJson(error));
         }
     }
 }

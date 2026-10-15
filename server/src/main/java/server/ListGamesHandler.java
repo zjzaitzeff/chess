@@ -1,4 +1,5 @@
 package server;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
@@ -16,14 +17,18 @@ public class ListGamesHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
+        var serializer = new Gson();
+        context.contentType("application/json");
         try {
             String authToken = context.header("authorization");
             ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
             ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
-            context.status(200).json(listGamesResult);
+            var whatToExport = serializer.toJson(listGamesResult);
+            context.status(200).json(whatToExport);
         } catch (UnauthorizedException exception) {
             context.status(401);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.result(serializer.toJson(error));
         }
     }
 }

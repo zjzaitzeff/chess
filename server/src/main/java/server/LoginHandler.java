@@ -15,16 +15,21 @@ public class LoginHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
+        var serializer = new Gson();
+        context.contentType("application/json");
         try {
-            LoginRequest loginRequest = new Gson().fromJson(context.body(), LoginRequest.class);
+            var jsonInfo = context.body();
+            LoginRequest loginRequest = serializer.fromJson(jsonInfo, LoginRequest.class);
             LoginResult loginResult = userService.login(loginRequest);
-            context.status(200).json(loginResult);
+            var whatToExport = serializer.toJson(loginResult);
+            context.status(200).json(whatToExport);
         } catch (BadRequestException exception) {
-            context.status(400);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.status(400).result(serializer.toJson(error));
         } catch (UnauthorizedException exception) {
             context.status(401);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.result(serializer.toJson(error));
         }
     }
 }

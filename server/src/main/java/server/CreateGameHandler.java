@@ -18,18 +18,22 @@ public class CreateGameHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
+        var serializer = new Gson();
+        context.contentType("application/json");
         try {
             String authToken = context.header("authorization");
-            String gameName = new Gson().fromJson(context.body(), String.class);
+            String gameName = serializer.fromJson(context.body(), String.class);
             CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
             CreateGameResult createGameResult = gameService.createGame(createGameRequest);
-            context.status(200).json(createGameResult);
+            var whatToExport = serializer.toJson(createGameResult);
+            context.status(200).json(whatToExport);
         } catch (BadRequestException exception) {
-            context.status(400);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.status(400).result(serializer.toJson(error));
         } catch (UnauthorizedException exception) {
             context.status(401);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.result(serializer.toJson(error));
         }
     }
 }

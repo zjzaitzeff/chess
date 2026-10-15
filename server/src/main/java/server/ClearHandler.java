@@ -1,4 +1,5 @@
 package server;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.*;
@@ -13,7 +14,10 @@ public class ClearHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
-            ClearResult clearResult = clearService.clear();
-            context.status(200).json(clearResult);
+        var serializer = new Gson();
+        context.contentType("application/json");
+        ClearResult clearResult = clearService.clear();
+        var whatToExport = serializer.toJson(clearResult);
+        context.status(200).json(whatToExport);
     }
 }

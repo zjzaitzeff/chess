@@ -18,14 +18,18 @@ public class LogoutHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
+        var serializer = new Gson();
+        context.contentType("application/json");
         try {
             String authToken = context.header("authorization");
             LogoutRequest logoutRequest = new LogoutRequest(authToken);
             LogoutResult logoutResult = userService.logout(logoutRequest);
-            context.status(200).json(logoutResult);
+            var whatToExport = serializer.toJson(logoutResult);
+            context.status(200).json(whatToExport);
         } catch (UnauthorizedException exception) {
             context.status(401);
-            context.json(Map.of("message", exception.getMessage()));
+            var error = Map.of("message", exception.getMessage());
+            context.result(serializer.toJson(error));
         }
     }
 }
