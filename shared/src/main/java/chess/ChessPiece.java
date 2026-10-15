@@ -102,6 +102,28 @@ public class ChessPiece {
         }
     }
 
+    private void whitePawnTwoHelper(Collection<ChessMove> validMoves, ChessPosition myPosition, ChessPosition targetPosition, int r, int c, ChessBoard board) {
+        validMoves.add(new ChessMove(myPosition, targetPosition, null));
+        if (r==2) {
+            ChessPosition targetPosition_two = new ChessPosition(r+2, c);
+            ChessPiece targetPiece_two = board.getPiece(targetPosition_two);
+            if (targetPiece_two == null) {
+                validMoves.add(new ChessMove(myPosition,targetPosition_two,null));
+            }
+        }
+    }
+
+    private void blackPawnTwoHelper(Collection<ChessMove> validMoves, ChessPosition myPosition, ChessPosition targetPosition, int r, int c, ChessBoard board) {
+        validMoves.add(new ChessMove(myPosition, targetPosition, null));
+        if (r==7) {
+            ChessPosition targetPosition_two = new ChessPosition(r-2, c);
+            ChessPiece targetPiece_two = board.getPiece(targetPosition_two);
+            if (targetPiece_two == null) {
+                validMoves.add(new ChessMove(myPosition,targetPosition_two,null));
+            }
+        }
+    }
+
     public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         // white
@@ -113,14 +135,7 @@ public class ChessPiece {
                     if (r+1 == 8) {
                         addPromotionMoves(validMoves, myPosition, targetPosition);
                     } else {
-                        validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                        if (r==2) {
-                            ChessPosition targetPosition_two = new ChessPosition(r+2, c);
-                            ChessPiece targetPiece_two = board.getPiece(targetPosition_two);
-                            if (targetPiece_two == null) {
-                                validMoves.add(new ChessMove(myPosition,targetPosition_two,null));
-                            }
-                        }
+                        whitePawnTwoHelper(validMoves, myPosition, targetPosition, r, c, board);
                     }
                 }
             }
@@ -143,14 +158,7 @@ public class ChessPiece {
                     if (r-1 == 1) {
                         addPromotionMoves(validMoves, myPosition, targetPosition);
                     } else {
-                        validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                        if (r==7) {
-                            ChessPosition targetPosition_two = new ChessPosition(r-2, c);
-                            ChessPiece targetPiece_two = board.getPiece(targetPosition_two);
-                            if (targetPiece_two == null) {
-                                validMoves.add(new ChessMove(myPosition,targetPosition_two,null));
-                            }
-                        }
+                        blackPawnTwoHelper(validMoves, myPosition, targetPosition, r, c, board);
                     }
                 }
             }
