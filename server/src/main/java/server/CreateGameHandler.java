@@ -22,9 +22,9 @@ public class CreateGameHandler implements Handler {
         context.contentType("application/json");
         try {
             String authToken = context.header("authorization");
-            String gameName = serializer.fromJson(context.body(), String.class);
-            CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
-            CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+            var jsonInfo = context.body();
+            CreateGameRequest createGameRequest = serializer.fromJson(jsonInfo, CreateGameRequest.class);
+            CreateGameResult createGameResult = gameService.createGame(authToken, createGameRequest);
             var whatToExport = serializer.toJson(createGameResult);
             context.status(200).json(whatToExport);
         } catch (BadRequestException exception) {

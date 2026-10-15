@@ -42,7 +42,8 @@ public class UserService {
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             throw new BadRequestException("Error 400: Bad Request");
         }
-        if (!password.equals(users.getUser(username).password())) {
+        UserData user = users.getUser(loginRequest.username());
+        if (user == null || !password.equals(users.getUser(username).password())) {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
         String authTokenID = generateToken();

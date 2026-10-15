@@ -157,10 +157,11 @@ public class ServiceClassTests {
     public void createGameBadRequest() throws DataAccessException {
         GameDAO gameDAO = new MemGameDAO();
         AuthDAO authDAO = new MemAuthDAO();
+        authDAO.createAuth(new AuthData("01234", "Cow"));
         GameService gameService = new GameService(gameDAO, authDAO);
-        CreateGameRequest createGameRequest = new CreateGameRequest(null, "");
+        CreateGameRequest createGameRequest = new CreateGameRequest(null);
         Assertions.assertThrows(BadRequestException.class, () -> {
-            gameService.createGame(createGameRequest);
+            gameService.createGame("01234",createGameRequest);
         });
     }
 
@@ -170,11 +171,11 @@ public class ServiceClassTests {
         GameDAO gameDAO = new MemGameDAO();
         AuthDAO authDAO = new MemAuthDAO();
         GameService gameService = new GameService(gameDAO, authDAO);
-        CreateGameRequest createGameRequest = new CreateGameRequest("Evil cow", "Revenge of the Cows");
-        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> gameService.createGame(createGameRequest));
+        CreateGameRequest createGameRequest = new CreateGameRequest("Revenge of the Cows");
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> gameService.createGame("01234",createGameRequest));
         assertEquals("Error 401: Unauthorized", exception.getMessage());
-        CreateGameRequest createGamesRequestTwo = new CreateGameRequest(null, "Cow");
-        assertThrows(UnauthorizedException.class, () -> gameService.createGame(createGamesRequestTwo));
+        CreateGameRequest createGamesRequestTwo = new CreateGameRequest("Cow");
+        assertThrows(UnauthorizedException.class, () -> gameService.createGame("01234",createGamesRequestTwo));
     }
 
     @Test
@@ -184,8 +185,8 @@ public class ServiceClassTests {
         AuthDAO authDAO = new MemAuthDAO();
         authDAO.createAuth(new AuthData("Evil cow", "Cow"));
         GameService gameService = new GameService(gameDAO, authDAO);
-        CreateGameRequest createGameRequest = new CreateGameRequest("Evil cow", "Revenge of the Cows");
-        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        CreateGameRequest createGameRequest = new CreateGameRequest("Revenge of the Cows");
+        CreateGameResult createGameResult = gameService.createGame("Evil cow", createGameRequest);
         assertNotNull(createGameResult);
     }
 

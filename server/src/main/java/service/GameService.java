@@ -39,9 +39,8 @@ public class GameService {
     return new ListGamesResult(gameList);
     }
 
-    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
+    public CreateGameResult createGame(String authToken, CreateGameRequest createGameRequest) throws DataAccessException {
         String gameName = createGameRequest.gameName();
-        String authToken = createGameRequest.authToken();
         // 400 bad request
         if (gameName == null || gameName.isEmpty()) {
             throw new BadRequestException("Error 400: Bad Request");
@@ -61,7 +60,7 @@ public class GameService {
         String playerColor = joinGameRequest.playerColor();
         int gameID = joinGameRequest.gameID();
         //400 bad request
-        if ((!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || gameID <= 1000 || gameID > 10000 || games.getGame(gameID) == null) {
+        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || gameID <= 1000 || gameID > 10000 || games.getGame(gameID) == null) {
             throw new BadRequestException("Error 400: Bad Request");
         }
         //401 unauthorized
