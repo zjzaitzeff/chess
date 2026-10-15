@@ -12,9 +12,6 @@ public class Server {
         // Register your endpoints and exception handlers here
 
     }
-    public static String generateToken() {
-        return UUID.randomUUID().toString();
-    }
 
     public int run(int desiredPort) {
         javalin.start(desiredPort);

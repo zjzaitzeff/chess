@@ -20,6 +20,7 @@ public class MemoryDataAccessTest {
         d.createUser(user);
         return d.getUser(user.username());
     }
+
     @Test
     @DisplayName("Clear User")
     public void clearUser() {
@@ -29,6 +30,7 @@ public class MemoryDataAccessTest {
         d.clear();
         assertNull(d.getUser(user.username()));
     }
+
     @Test
     @DisplayName("Create user")
     public void createUser() {
@@ -36,6 +38,7 @@ public class MemoryDataAccessTest {
         var user = registerRandomUser(d);
         assertNotNull(d.getUser(user.username()));
     }
+
     @Test
     @DisplayName("Get user")
     public void getUser() {
@@ -43,6 +46,7 @@ public class MemoryDataAccessTest {
         var user = registerRandomUser(d);
         assertEquals(user, d.getUser(user.username()));
     }
+
     @Test
     @DisplayName("Create Auth")
     public void createAuth() {
@@ -51,6 +55,7 @@ public class MemoryDataAccessTest {
         d.createAuth(authToken);
         assertNotNull(d.getAuth(authToken.authToken()));
     }
+
     @Test
     @DisplayName("Get auth")
     public void getAuth() {
@@ -59,6 +64,7 @@ public class MemoryDataAccessTest {
         d.createAuth(authToken);
         assertEquals(authToken, d.getAuth(authToken.authToken()));
     }
+
     @Test
     @DisplayName("Delete auth")
     public void deleteAuth() {
@@ -69,6 +75,7 @@ public class MemoryDataAccessTest {
         d.deleteAuth(authToken.authToken());
         assertNull(d.getAuth(authToken.authToken()));
     }
+
     @Test
     @DisplayName("Update auth")
     public void updateAuth() {
@@ -79,6 +86,7 @@ public class MemoryDataAccessTest {
         d.updateAuth("01234",authTokenTwo);
         assertNotEquals(authTokenOne, d.getAuth(authTokenTwo.authToken()));
     }
+
     @Test
     @DisplayName("Clear auth")
     public void clearAuth() {
@@ -91,11 +99,13 @@ public class MemoryDataAccessTest {
         assertNull(d.getAuth(authTokenOne.authToken()));
         assertNull(d.getAuth(authTokenTwo.authToken()));
     }
+
     GameData generateAndAddGame(MemGameDAO d) {
         var game = new GameData(1234, "cow", "cyote", "name", new ChessGame());
         d.createGame(game);
         return game;
     }
+
     // createGame, getGame, deleteGame, updateGame, listGames, clear
     @Test
     @DisplayName("Create Game")
@@ -104,6 +114,7 @@ public class MemoryDataAccessTest {
         var game = generateAndAddGame(d);
         assertNotNull(d.getGame(game.gameID()));
     }
+
     @Test
     @DisplayName("Get Game")
     public void getGame() {
@@ -111,6 +122,7 @@ public class MemoryDataAccessTest {
         var game = generateAndAddGame(d);
         assertEquals(game, d.getGame(game.gameID()));
     }
+
     @Test
     @DisplayName("delete Game")
     public void deleteGame() {
@@ -120,6 +132,7 @@ public class MemoryDataAccessTest {
         d.deleteGame(game.gameID());
         assertNull(d.getGame(game.gameID()));
     }
+
     @Test
     @DisplayName("Update Game")
     public void updateGame() {
@@ -130,6 +143,7 @@ public class MemoryDataAccessTest {
         d.updateGame(game.gameID(), gameTwo);
         assertEquals(d.getGame(game.gameID()), d.getGame(gameTwo.gameID()));
     }
+
     @Test
     @DisplayName("List Games")
     public void listGames() {
