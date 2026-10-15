@@ -58,9 +58,9 @@ public class GameService {
 
     public JoinGameResult joinGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
         String pColor = joinGameRequest.playerColor();
-        int gameID = joinGameRequest.gameID();
+        int gID = joinGameRequest.gameID();
         //400 bad request
-        if (pColor == null || (!pColor.equals("WHITE") && !pColor.equals("BLACK")) || gameID <= 1000 || gameID > 10000 || games.getGame(gameID) == null) {
+        if (pColor == null || (!pColor.equals("WHITE") && !pColor.equals("BLACK")) || gID <= 1000 || gID > 10000 || games.getGame(gID) == null) {
             throw new BadRequestException("Error 400: Bad Request");
         }
         //401 unauthorized
@@ -68,7 +68,7 @@ public class GameService {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
         //403 already taken
-        GameData game = games.getGame(gameID);
+        GameData game = games.getGame(gID);
         if (pColor.equals("WHITE")) {
             if (game.whiteUsername() != null) {
                 throw new AlreadyTakenException("Error 403: Already Taken");
@@ -81,11 +81,11 @@ public class GameService {
         //200
         String username = authTokens.getAuth(authToken).username();
         if (pColor.equals("WHITE")) {
-            GameData updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.chess());
-            games.updateGame(gameID, updatedGame);
+            GameData updatedGame = new GameData(gID, username, game.blackUsername(), game.gameName(), game.chess());
+            games.updateGame(gID, updatedGame);
         } else {
-            GameData updatedGame = new GameData(gameID, game.whiteUsername(), username, game.gameName(), game.chess());
-            games.updateGame(gameID, updatedGame);
+            GameData updatedGame = new GameData(gID, game.whiteUsername(), username, game.gameName(), game.chess());
+            games.updateGame(gID, updatedGame);
         }
         return new JoinGameResult();
     }
