@@ -50,6 +50,7 @@ public class UserService {
         authTokens.createAuth(authToken);
         return new LoginResult(username, authTokenID);
     }
+
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
         String authTokenID = logoutRequest.authToken();
         //401 unauthorized

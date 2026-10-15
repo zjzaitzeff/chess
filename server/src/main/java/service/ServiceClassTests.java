@@ -26,6 +26,7 @@ public class ServiceClassTests {
             userService.register(practiceRequest);
         });
     }
+
     @Test
     @DisplayName("Register Already Taken")
     public void registerAlreadyTaken() throws DataAccessException {
@@ -39,6 +40,7 @@ public class ServiceClassTests {
             userService.register(practiceRequest);
         });
     }
+
     @Test
     @DisplayName("Register Success")
     public void registerSuccess() throws DataAccessException {
@@ -53,6 +55,7 @@ public class ServiceClassTests {
         assertEquals("Cow", registerResult.username());
         assertEquals(authDAO.getAuth(registerResult.authToken()).authToken(), registerResult.authToken());
     }
+
     @Test
     @DisplayName("Login Bad Request")
     public void loginBadRequest() {
@@ -64,6 +67,7 @@ public class ServiceClassTests {
             userService.login(practiceRequest);
         });
     }
+
     @Test
     @DisplayName("Login Unauthorized")
     public void loginUnauthorized() throws DataAccessException {
@@ -77,6 +81,7 @@ public class ServiceClassTests {
            userService.login(practiceRequest);
         });
     }
+
     @Test
     @DisplayName("Login Success")
     public void loginSuccess() throws DataAccessException {
@@ -92,6 +97,7 @@ public class ServiceClassTests {
         assertNotNull(loginResult.authToken());
         assertEquals("Cow", loginResult.username());
     }
+
     @Test
     @DisplayName("Logout Unauthorized")
     public void logoutUnauthorized() throws DataAccessException {
@@ -104,6 +110,7 @@ public class ServiceClassTests {
         LogoutRequest logoutRequestTwo = new LogoutRequest(null);
         assertThrows(UnauthorizedException.class, () -> userService.logout(logoutRequestTwo));
     }
+
     @Test
     @DisplayName("Logout Success")
     public void logoutSuccess() throws DataAccessException {
@@ -118,6 +125,7 @@ public class ServiceClassTests {
         LogoutResult logoutResult = userService.logout(new LogoutRequest(loginResult.authToken()));
         assertNull(authDAO.getAuth(loginResult.authToken()));
     }
+
     @Test
     @DisplayName("List Games Unauthorized")
     public void listGamesUnauthorized() throws DataAccessException {
@@ -130,6 +138,7 @@ public class ServiceClassTests {
         ListGamesRequest listGamesRequestTwo = new ListGamesRequest(null);
         assertThrows(UnauthorizedException.class, () -> gameService.listGames(listGamesRequestTwo));
     }
+
     @Test
     @DisplayName("List Games Success")
     public void listGamesSuccess() throws DataAccessException {
@@ -142,6 +151,7 @@ public class ServiceClassTests {
         ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
         assertEquals(listGamesResult.games(), gameDAO.listGames());
     }
+
     @Test
     @DisplayName("Create Game Bad Request")
     public void createGameBadRequest() throws DataAccessException {
@@ -153,6 +163,7 @@ public class ServiceClassTests {
             gameService.createGame(createGameRequest);
         });
     }
+
     @Test
     @DisplayName("Create Game Unauthorized")
     public void createGameUnauthorized() throws DataAccessException {
@@ -165,6 +176,7 @@ public class ServiceClassTests {
         CreateGameRequest createGamesRequestTwo = new CreateGameRequest(null, "Cow");
         assertThrows(UnauthorizedException.class, () -> gameService.createGame(createGamesRequestTwo));
     }
+
     @Test
     @DisplayName("Create Game Success")
     public void createGameSuccess() throws DataAccessException {
@@ -176,6 +188,7 @@ public class ServiceClassTests {
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);
         assertNotNull(createGameResult);
     }
+
     @Test
     @DisplayName("Clear")
     public void clear() throws DataAccessException {

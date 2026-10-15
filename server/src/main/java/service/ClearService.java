@@ -10,6 +10,7 @@ public class ClearService {
         this.users = userDAO;
         this.games = gameDAO;
     }
+
     public ClearResult clear() throws DataAccessException {
         authTokens.clear();
         users.clear();

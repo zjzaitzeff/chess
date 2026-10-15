@@ -13,10 +13,12 @@ public class GameService {
     private final GameDAO games;
     private final AuthDAO authTokens;
     private final Collection<Integer> tokens = new ArrayList<>(List.of(0));
+
     public GameService(GameDAO gamesDAO, AuthDAO authTokenDAO) {
         this.games = gamesDAO;
         this.authTokens = authTokenDAO;
     }
+
    private int generateGameID() {
         int gameID = 0;
         while (tokens.contains(gameID)) {
@@ -26,7 +28,7 @@ public class GameService {
         return gameID;
 
    }
-// listGames, createGame, joinGame
+
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException {
         String authToken = listGamesRequest.authToken();
         //401 unauthorized
@@ -54,6 +56,7 @@ public class GameService {
         games.createGame(game);
         return new CreateGameResult(gameID);
     }
+
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
         String authToken = joinGameRequest.authToken();
         String playerColor = joinGameRequest.playerColor();
