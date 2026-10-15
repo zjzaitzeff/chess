@@ -157,31 +157,26 @@ public class ChessPiece {
             if (r-1 >= 1 && c+1 <= 8) {
                 ChessPosition targetPosition = new ChessPosition(r-1,c+1);
                 ChessPiece targetPiece = board.getPiece(targetPosition);
-                if (targetPiece != null) {
-                    if (targetPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-                        if (r-1 == 1) {
-                            addPromotionMoves(validMoves, myPosition, targetPosition);
-                        } else {
-                            validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                        }
-                    }
-                }
+                blackPawnHelper(validMoves, myPosition, targetPosition, r, targetPiece);
             }
             if (r-1 >= 1 && c-1 >= 1) {
                 ChessPosition targetPosition = new ChessPosition(r-1,c-1);
                 ChessPiece targetPiece = board.getPiece(targetPosition);
-                if (targetPiece != null) {
-                    if (targetPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-                        if (r-1 == 1) {
-                            addPromotionMoves(validMoves, myPosition, targetPosition);
-                        } else {
-                            validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                        }
-                    }
-                }
+                blackPawnHelper(validMoves, myPosition, targetPosition, r, targetPiece);
             }
         }
         return validMoves;
+    }
+    private void blackPawnHelper(Collection<ChessMove> validMoves, ChessPosition myPosition, ChessPosition targetPosition, int r, ChessPiece targetPiece) {
+        if (targetPiece != null) {
+            if (targetPiece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
+                if (r-1 == 1) {
+                    addPromotionMoves(validMoves, myPosition, targetPosition);
+                } else {
+                    validMoves.add(new ChessMove(myPosition, targetPosition, null));
+                }
+            }
+        }
     }
     public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> validMoves = new ArrayList<>();
