@@ -141,13 +141,11 @@ public class ChessGame {
             for (int j=1;j<9;j++) {
                 ChessPosition current_position = new ChessPosition(i, j);
                 ChessPiece p = theBoard.getPiece(current_position);
-                if (p != null) {
-                    if (!teamColor.equals(p.getTeamColor())) {
-                        Collection<ChessMove> moves = p.pieceMoves(theBoard, current_position);
-                        for (ChessMove move : moves) {
-                            if (move.getEndPosition().equals(king_position)) {
-                                return true;
-                            }
+                if (p != null && (!teamColor.equals(p.getTeamColor()))) {
+                    Collection<ChessMove> moves = p.pieceMoves(theBoard, current_position);
+                    for (ChessMove move : moves) {
+                        if (move.getEndPosition().equals(king_position)) {
+                            return true;
                         }
                     }
                 }
