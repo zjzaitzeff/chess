@@ -11,12 +11,12 @@ import java.util.Objects;
 public class ChessMove {
     ChessPosition sp;
     ChessPosition ep;
-    ChessPiece.PieceType promotion_type;
+    ChessPiece.PieceType promotionType;
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         sp = startPosition;
         ep = endPosition;
-        promotion_type = promotionPiece;
+        promotionType = promotionPiece;
     }
 
     /**
@@ -35,7 +35,7 @@ public class ChessMove {
      *
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
-    public ChessPiece.PieceType getPromotionPiece() {return promotion_type;}
+    public ChessPiece.PieceType getPromotionPiece() {return promotionType;}
 
     @Override
     public boolean equals(Object o) {
@@ -43,15 +43,15 @@ public class ChessMove {
             return false;
         }
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(sp, chessMove.sp) && Objects.equals(ep, chessMove.ep) && promotion_type == chessMove.promotion_type;
+        return Objects.equals(sp, chessMove.sp) && Objects.equals(ep, chessMove.ep) && promotionType == chessMove.promotionType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sp, ep, promotion_type);
+        return Objects.hash(sp, ep, promotionType);
     }
     @Override
     public String toString() {
-        return String.format("startpos: %s endpos: %s promotion_type: %s", sp,ep,promotion_type);
+        return String.format("startpos: %s endpos: %s promotion_type: %s", sp,ep,promotionType);
     }
 }

@@ -13,10 +13,10 @@ import java.util.Objects;
  */
 public class ChessPiece {
     ChessGame.TeamColor color;
-    PieceType type_piece;
+    PieceType typePiece;
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         color = pieceColor;
-        type_piece = type;
+        typePiece = type;
     }
 
     /**
@@ -42,7 +42,7 @@ public class ChessPiece {
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return type_piece;
+        return typePiece;
     }
 
     /**
@@ -59,31 +59,31 @@ public class ChessPiece {
         PieceType type = board.getPiece(myPosition).getPieceType();
         // pawn
         if (type.equals(PieceType.PAWN)) {
-        return pawn_moves(board, myPosition,r,c,color);}
+        return pawnMoves(board, myPosition,r,c,color);}
         // rook x
         else if (type.equals(PieceType.ROOK)) {
-            return rook_moves(board, myPosition,r,c,color);
+            return rookMoves(board, myPosition,r,c,color);
         }
         // knight
         else if (type.equals(PieceType.KNIGHT)) {
-            return knight_moves(board, myPosition,r,c,color);
+            return knightMoves(board, myPosition,r,c,color);
         }
         // bishop
         else if (type.equals(PieceType.BISHOP)) {
-            return bishop_moves(board, myPosition,r,c,color);
+            return bishopMoves(board, myPosition,r,c,color);
         }
         // queen
         else if (type.equals(PieceType.QUEEN)) {
-            return queen_moves(board, myPosition,r,c,color);
+            return queenMoves(board, myPosition,r,c,color);
         }
         // king
         else if (type.equals(PieceType.KING)) {
-            return king_moves(board, myPosition,r,c,color);
+            return kingMoves(board, myPosition,r,c,color);
         }
         throw new RuntimeException("Not implemented");
     }
 
-    public Collection<ChessMove> pawn_moves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
+    public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> valid_moves = new ArrayList<>();
         // white
         if (color.equals(ChessGame.TeamColor.WHITE)) {
@@ -198,7 +198,7 @@ public class ChessPiece {
         }
         return valid_moves;
     }
-    public Collection<ChessMove> rook_moves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
+    public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> valid_moves = new ArrayList<>();
         ChessPosition target_position;
         // up
@@ -256,7 +256,7 @@ public class ChessPiece {
         return valid_moves;
     }
 
-    public Collection<ChessMove> knight_moves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
+    public Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> valid_moves = new ArrayList<>();
         if (r+1 <= 8 && c+2 <=8) {
             ChessPosition target_position = new ChessPosition(r+1, c+2);
@@ -332,7 +332,7 @@ public class ChessPiece {
         }
         return valid_moves;
     }
-    public Collection<ChessMove> bishop_moves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
+    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> valid_moves = new ArrayList<>();
         // up up
         for (int i = r + 1, j = c + 1; i <= 8 && j <= 8; i++, j++) {
@@ -388,15 +388,15 @@ public class ChessPiece {
         }
         return valid_moves;
     }
-    public Collection<ChessMove> queen_moves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
+    public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> valid_moves = new ArrayList<>();
-        Collection<ChessMove> rook_moves = rook_moves(board, myPosition,r,c,color);
+        Collection<ChessMove> rook_moves = rookMoves(board, myPosition,r,c,color);
         valid_moves.addAll(rook_moves);
-        Collection<ChessMove> bishop_moves = bishop_moves(board,myPosition,r,c,color);
+        Collection<ChessMove> bishop_moves = bishopMoves(board,myPosition,r,c,color);
         valid_moves.addAll(bishop_moves);
         return valid_moves;
     }
-    public Collection<ChessMove> king_moves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
+    public Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> valid_moves = new ArrayList<>();
         if (r+1 <= 8 && c+1 <= 8) {
             ChessPosition target_position = new ChessPosition(r+1, c+1);
@@ -479,19 +479,19 @@ public class ChessPiece {
             return false;
         }
         ChessPiece that = (ChessPiece) o;
-        return color == that.color && type_piece == that.type_piece;
+        return color == that.color && typePiece == that.typePiece;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(color, type_piece);
+        return Objects.hash(color, typePiece);
     }
 
     @Override
     public String toString() {
         return "ChessPiece{" +
                 "color=" + color +
-                ", type_piece=" + type_piece +
+                ", type_piece=" + typePiece +
                 '}';
     }
 }

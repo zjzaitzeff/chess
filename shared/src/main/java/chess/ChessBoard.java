@@ -71,7 +71,7 @@ public class ChessBoard {
         addPiece(new ChessPosition(8,7), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT));
         addPiece(new ChessPosition(8,8), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK));
     }
-    public ChessBoard copy_board() {
+    public ChessBoard copyBoard() {
         ChessBoard new_board = new ChessBoard();
         for (int i = 1; i<9;i++) {
             for (int j=1;j<9;j++) {
