@@ -142,18 +142,23 @@ public class ChessGame {
                 ChessPosition current_position = new ChessPosition(i, j);
                 ChessPiece p = theBoard.getPiece(current_position);
                 if (p != null && (!teamColor.equals(p.getTeamColor()))) {
-                    Collection<ChessMove> moves = p.pieceMoves(theBoard, current_position);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(king_position)) {
-                            return true;
-                        }
+                    if (isInCheckHelper(p, current_position, king_position)) {
+                        return true;
                     }
                 }
             }
         }
         return false;
     }
-
+    private boolean isInCheckHelper(ChessPiece p, ChessPosition current_position, ChessPosition king_position) {
+        Collection<ChessMove> moves = p.pieceMoves(theBoard, current_position);
+        for (ChessMove move : moves) {
+            if (move.getEndPosition().equals(king_position)) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Determines if the given team is in checkmate
      *
