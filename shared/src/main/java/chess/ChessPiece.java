@@ -83,6 +83,13 @@ public class ChessPiece {
         throw new RuntimeException("Not implemented");
     }
 
+    private void addPromotionMoves(Collection<ChessMove> valid_moves, ChessPosition myPosition, ChessPosition targetPosition) {
+        valid_moves.add(new ChessMove(myPosition, targetPosition, ChessPiece.PieceType.QUEEN));
+        valid_moves.add(new ChessMove(myPosition, targetPosition, ChessPiece.PieceType.KNIGHT));
+        valid_moves.add(new ChessMove(myPosition, targetPosition, ChessPiece.PieceType.ROOK));
+        valid_moves.add(new ChessMove(myPosition, targetPosition, ChessPiece.PieceType.BISHOP));
+    }
+
     public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> valid_moves = new ArrayList<>();
         // white
@@ -92,10 +99,7 @@ public class ChessPiece {
                 ChessPiece target_piece = board.getPiece(target_position);
                 if (target_piece == null) {
                     if (r+1 == 8) {
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.QUEEN));
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.KNIGHT));
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.ROOK));
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.BISHOP));
+                        addPromotionMoves(valid_moves, myPosition, target_position);
                     } else {
                         valid_moves.add(new ChessMove(myPosition, target_position, null));
                         if (r==2) {
@@ -114,10 +118,7 @@ public class ChessPiece {
                 if (target_piece != null) {
                     if (target_piece.getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
                         if (r+1 == 8) {
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.QUEEN));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.KNIGHT));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.ROOK));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.BISHOP));
+                            addPromotionMoves(valid_moves, myPosition, target_position);
                         } else {
                             valid_moves.add(new ChessMove(myPosition, target_position, null));
                     }
@@ -130,10 +131,7 @@ public class ChessPiece {
                 if (target_piece != null) {
                     if (target_piece.getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
                         if (r+1 == 8) {
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.QUEEN));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.KNIGHT));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.ROOK));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.BISHOP));
+                            addPromotionMoves(valid_moves, myPosition, target_position);
                         } else {
                             valid_moves.add(new ChessMove(myPosition, target_position, null));
                         }
@@ -147,10 +145,7 @@ public class ChessPiece {
                 ChessPiece target_piece = board.getPiece(target_position);
                 if (target_piece == null) {
                     if (r-1 == 1) {
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.QUEEN));
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.KNIGHT));
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.ROOK));
-                        valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.BISHOP));
+                        addPromotionMoves(valid_moves, myPosition, target_position);
                     } else {
                         valid_moves.add(new ChessMove(myPosition, target_position, null));
                         if (r==7) {
@@ -169,10 +164,7 @@ public class ChessPiece {
                 if (target_piece != null) {
                     if (target_piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
                         if (r-1 == 1) {
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.QUEEN));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.KNIGHT));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.ROOK));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.BISHOP));
+                            addPromotionMoves(valid_moves, myPosition, target_position);
                         } else {
                             valid_moves.add(new ChessMove(myPosition, target_position, null));
                         }
@@ -185,10 +177,7 @@ public class ChessPiece {
                 if (target_piece != null) {
                     if (target_piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
                         if (r-1 == 1) {
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.QUEEN));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.KNIGHT));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.ROOK));
-                            valid_moves.add(new ChessMove(myPosition, target_position, ChessPiece.PieceType.BISHOP));
+                            addPromotionMoves(valid_moves, myPosition, target_position);
                         } else {
                             valid_moves.add(new ChessMove(myPosition, target_position, null));
                         }
