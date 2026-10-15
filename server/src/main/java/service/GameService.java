@@ -57,10 +57,10 @@ public class GameService {
     }
 
     public JoinGameResult joinGame(String authToken, JoinGameRequest joinGameRequest) throws DataAccessException {
-        String playerColor = joinGameRequest.playerColor();
+        String pColor = joinGameRequest.playerColor();
         int gameID = joinGameRequest.gameID();
         //400 bad request
-        if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || gameID <= 1000 || gameID > 10000 || games.getGame(gameID) == null) {
+        if (pColor == null || (!pColor.equals("WHITE") && !pColor.equals("BLACK")) || gameID <= 1000 || gameID > 10000 || games.getGame(gameID) == null) {
             throw new BadRequestException("Error 400: Bad Request");
         }
         //401 unauthorized
@@ -69,7 +69,7 @@ public class GameService {
         }
         //403 already taken
         GameData game = games.getGame(gameID);
-        if (playerColor.equals("WHITE")) {
+        if (pColor.equals("WHITE")) {
             if (game.whiteUsername() != null) {
                 throw new AlreadyTakenException("Error 403: Already Taken");
             }
@@ -80,7 +80,7 @@ public class GameService {
         }
         //200
         String username = authTokens.getAuth(authToken).username();
-        if (playerColor.equals("WHITE")) {
+        if (pColor.equals("WHITE")) {
             GameData updatedGame = new GameData(gameID, username, game.blackUsername(), game.gameName(), game.chess());
             games.updateGame(gameID, updatedGame);
         } else {
