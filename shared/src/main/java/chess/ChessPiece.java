@@ -297,57 +297,42 @@ public class ChessPiece {
         }
         return validMoves;
     }
+    private boolean bishopHelper(int r, int c, ChessBoard board, Collection<ChessMove> validMoves, ChessPosition myPosition, ChessGame.TeamColor color) {
+        ChessPosition targetPosition = new ChessPosition(r,c);
+        ChessPiece targetPiece = board.getPiece(targetPosition);
+        if (targetPiece == null) {
+            validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            return false;
+        } else if (color.equals(targetPiece.getTeamColor())) {
+            return true;
+        } else {
+            validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            return true;
+        }
+    }
     public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         // up up
         for (int i = r + 1, j = c + 1; i <= 8 && j <= 8; i++, j++) {
-                ChessPosition targetPosition = new ChessPosition(i,j);
-                ChessPiece targetPiece = board.getPiece(targetPosition);
-                if (targetPiece == null) {
-                    validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                } else if (color.equals(targetPiece.getTeamColor())) {
-                    break;
-                } else {
-                    validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                    break;
-                }
+            if (bishopHelper(i, j, board, validMoves, myPosition, color)) {
+                break;
             }
+        }
         // up down
         for (int i = r + 1, j = c - 1; i <= 8 && j >= 1; i++, j--) {
-            ChessPosition targetPosition = new ChessPosition(i,j);
-            ChessPiece targetPiece = board.getPiece(targetPosition);
-            if (targetPiece == null) {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
-            } else if (color.equals(targetPiece.getTeamColor())) {
-                break;
-            } else {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            if (bishopHelper(i, j, board, validMoves, myPosition, color)) {
                 break;
             }
         }
         // down up
         for (int i = r - 1, j = c + 1; i >= 1 && j <= 8; i--, j++) {
-            ChessPosition targetPosition = new ChessPosition(i,j);
-            ChessPiece targetPiece = board.getPiece(targetPosition);
-            if (targetPiece == null) {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
-            } else if (color.equals(targetPiece.getTeamColor())) {
-                break;
-            } else {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            if (bishopHelper(i, j, board, validMoves, myPosition, color)) {
                 break;
             }
         }
         // down down
         for (int i = r - 1, j = c - 1; i >= 1 && j >= 1; i--, j--) {
-            ChessPosition targetPosition = new ChessPosition(i,j);
-            ChessPiece targetPiece = board.getPiece(targetPosition);
-            if (targetPiece == null) {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
-            } else if (color.equals(targetPiece.getTeamColor())) {
-                break;
-            } else {
-                validMoves.add(new ChessMove(myPosition, targetPosition, null));
+            if (bishopHelper(i, j, board, validMoves, myPosition, color)) {
                 break;
             }
         }
