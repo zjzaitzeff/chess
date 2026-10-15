@@ -90,6 +90,18 @@ public class ChessPiece {
         validMoves.add(new ChessMove(myPosition, targetPosition, ChessPiece.PieceType.BISHOP));
     }
 
+    private void whitePawnHelper(Collection<ChessMove> validMoves, ChessPosition myPosition, ChessPosition targetPosition, int r, ChessPiece targetPiece) {
+        if (targetPiece != null) {
+            if (targetPiece.getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
+                if (r+1 == 8) {
+                    addPromotionMoves(validMoves, myPosition, targetPosition);
+                } else {
+                    validMoves.add(new ChessMove(myPosition, targetPosition, null));
+                }
+            }
+        }
+    }
+
     public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, int r, int c, ChessGame.TeamColor color) {
         Collection<ChessMove> validMoves = new ArrayList<>();
         // white
@@ -115,28 +127,12 @@ public class ChessPiece {
             if (r+1 <= 8 && c+1 <= 8) {
                 ChessPosition targetPosition = new ChessPosition(r+1,c+1);
                 ChessPiece targetPiece = board.getPiece(targetPosition);
-                if (targetPiece != null) {
-                    if (targetPiece.getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-                        if (r+1 == 8) {
-                            addPromotionMoves(validMoves, myPosition, targetPosition);
-                        } else {
-                            validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                    }
-                }
-            }
+                whitePawnHelper(validMoves, myPosition, targetPosition, r, targetPiece);
         }
             if (r+1 <= 8 && c-1 >= 1) {
                 ChessPosition targetPosition = new ChessPosition(r+1,c-1);
                 ChessPiece targetPiece = board.getPiece(targetPosition);
-                if (targetPiece != null) {
-                    if (targetPiece.getTeamColor().equals(ChessGame.TeamColor.BLACK)) {
-                        if (r+1 == 8) {
-                            addPromotionMoves(validMoves, myPosition, targetPosition);
-                        } else {
-                            validMoves.add(new ChessMove(myPosition, targetPosition, null));
-                        }
-                    }
-                }
+                whitePawnHelper(validMoves, myPosition, targetPosition, r, targetPiece);
             }
         } // black
         else {
