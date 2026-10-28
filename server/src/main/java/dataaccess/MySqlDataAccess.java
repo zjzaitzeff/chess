@@ -1,6 +1,8 @@
 package dataaccess;
 
 import com.google.gson.Gson;
+import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -17,6 +19,7 @@ public class MySqlDataAccess {
     public MySqlDataAccess() throws DataAccessException {
         configureDatabase();
     }
+
     public void createUser(UserData user) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         String clearTextPassword = user.password();
@@ -40,6 +43,7 @@ public class MySqlDataAccess {
         }
         return null;
     }
+
     private UserData readUser(ResultSet rs) throws SQLException {
         var username = rs.getString("username");
         var hashedPassword = rs.getString("password");
@@ -78,6 +82,7 @@ public class MySqlDataAccess {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
+
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS  user (
@@ -118,4 +123,43 @@ public class MySqlDataAccess {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
+
+    public void createAuth(AuthData auth) throws DataAccessException {
+        var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+        int id = executeUpdate(statement, auth.authToken(), auth.username());
+    }
+
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT authToken, username FROM auth WHERE authToken=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return readToken(rs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return null;
+    }
+
+    private AuthData readToken(ResultSet rs) throws SQLException {
+        var authToken = rs.getString("authToken");
+        var username = rs.getString("username");
+        return new AuthData(authToken, username);
+    }
+
+    public void deleteAuth(String authToken) throws DataAccessException {
+        var statement = "DELETE FROM auth WHERE authToken=?";
+        executeUpdate(statement, authToken);
+    }
+
+    public void createGame(GameData gameData) throws DataAccessException {
+        var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?, ?)";
+        executeUpdate(statement, gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.chess());
+    }
+
 }
