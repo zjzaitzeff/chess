@@ -2,10 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import model.AuthData;
 import model.GameData;
-import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,8 +14,8 @@ import java.util.Collection;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class MySqlDataAccessGame implements GameDAO {
-
+//public class MySqlDataAccessGame implements GameDAO {
+public class MySqlDataAccessGame {
     public MySqlDataAccessGame() throws DataAccessException {
         configureDatabase();
     }
@@ -69,11 +66,6 @@ public class MySqlDataAccessGame implements GameDAO {
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
-    }
-
-    public void deleteAuth(String authToken) throws DataAccessException {
-        var statement = "DELETE FROM auth WHERE authToken=?";
-        executeUpdate(statement, authToken);
     }
 
     public void createGame(GameData gameData) throws DataAccessException {
@@ -134,5 +126,15 @@ public class MySqlDataAccessGame implements GameDAO {
     public void clear() throws DataAccessException {
         var statementGameClear = "TRUNCATE TABLE game";
         executeUpdate(statementGameClear);
+    }
+
+    public void updateGame(int gameID, GameData game) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, chessGame=? WHERE gameID=?";
+                String chessJson = new Gson().toJson(game.chess());
+                executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), chessJson, gameID);
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating the Chess Game :(");
+        }
     }
 }

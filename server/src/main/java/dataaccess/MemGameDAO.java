@@ -23,10 +23,10 @@ public class MemGameDAO implements GameDAO {
         games.remove(gameID);
     }
 
-//    @Override
-//    public void updateGame(int gameID, GameData g) {
-//        games.put(gameID, g);
-//    }
+    @Override
+    public void updateGame(int gameID, GameData g) {
+        games.put(gameID, g);
+    }
 
     @Override
     public Collection<GameData> listGames() {

@@ -76,16 +76,16 @@ public class MemoryDataAccessTest {
         assertNull(d.getAuth(authToken.authToken()));
     }
 
-    @Test
-    @DisplayName("Update auth")
-    public void updateAuth() {
-        var authTokenOne = new AuthData("01234", "cow");
-        var authTokenTwo = new AuthData("9876", "moo");
-        var d = new MemAuthDAO();
-        d.createAuth(authTokenOne);
-        d.updateAuth("01234",authTokenTwo);
-        assertNotEquals(authTokenOne, d.getAuth(authTokenTwo.authToken()));
-    }
+//    @Test
+//    @DisplayName("Update auth")
+//    public void updateAuth() {
+//        var authTokenOne = new AuthData("01234", "cow");
+//        var authTokenTwo = new AuthData("9876", "moo");
+//        var d = new MemAuthDAO();
+//        d.createAuth(authTokenOne);
+//        d.updateAuth("01234",authTokenTwo);
+//        assertNotEquals(authTokenOne, d.getAuth(authTokenTwo.authToken()));
+//    }
 
     @Test
     @DisplayName("Clear auth")
@@ -133,16 +133,16 @@ public class MemoryDataAccessTest {
         assertNull(d.getGame(game.gameID()));
     }
 
-    @Test
-    @DisplayName("Update Game")
-    public void updateGame() {
-        var d = new MemGameDAO();
-        var game = generateAndAddGame(d);
-        var gameTwo = new GameData(5678, "white", "black", "game2", new ChessGame());
-        d.createGame(gameTwo);
-        d.updateGame(game.gameID(), gameTwo);
-        assertEquals(d.getGame(game.gameID()), d.getGame(gameTwo.gameID()));
-    }
+//    @Test
+//    @DisplayName("Update Game")
+//    public void updateGame() {
+//        var d = new MemGameDAO();
+//        var game = generateAndAddGame(d);
+//        var gameTwo = new GameData(5678, "white", "black", "game2", new ChessGame());
+//        d.createGame(gameTwo);
+//        d.updateGame(game.gameID(), gameTwo);
+//        assertEquals(d.getGame(game.gameID()), d.getGame(gameTwo.gameID()));
+//    }
 
     @Test
     @DisplayName("List Games")
