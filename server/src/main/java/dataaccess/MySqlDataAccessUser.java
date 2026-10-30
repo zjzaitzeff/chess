@@ -1,18 +1,7 @@
 package dataaccess;
-
-import chess.ChessGame;
-import com.google.gson.Gson;
-import model.AuthData;
-import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.sql.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -55,12 +44,8 @@ public class MySqlDataAccessUser implements UserDAO {
     }
 
     public void clear() throws DataAccessException {
-        var statement = "TRUNCATE TABLE user";
+        var statement = "TRUNCATE user";
         executeUpdate(statement);
-        var statementAuthClear = "TRUNCATE TABLE auth";
-        executeUpdate(statementAuthClear);
-        var statementGameClear = "TRUNCATE TABLE game";
-        executeUpdate(statementGameClear);
     }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException {

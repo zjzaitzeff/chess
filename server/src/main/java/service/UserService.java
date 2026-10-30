@@ -49,7 +49,8 @@ public class UserService {
             throw new BadRequestException("Error 400: Bad Request");
         }
         UserData user = users.getUser(loginRequest.username());
-        if (user == null || !password.equals(users.getUser(username).password())) {
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        if (user == null || !hashedPassword.equals(users.getUser(username).password())) {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
         String authTokenID = generateToken();

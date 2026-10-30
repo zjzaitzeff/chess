@@ -4,14 +4,24 @@ import dataaccess.*;
 import service.*;
 
 public class Server {
-    private final UserDAO userDAO = new MemUserDAO();
-    private final AuthDAO authDAO = new MemAuthDAO();
-    private final GameDAO gameDAO = new MemGameDAO();
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
     private final Javalin javalin;
-    private final UserService userService = new UserService(userDAO, authDAO);
-    private final ClearService clearService = new ClearService(userDAO, authDAO, gameDAO);
-    private final GameService gameService = new GameService(gameDAO, authDAO);
+    private final UserService userService;
+    private final ClearService clearService;
+    private final GameService gameService;
     public Server() {
+        try {
+            userDAO = new MySqlDataAccessUser();
+            authDAO = new MySqlDataAccessAuth();
+            gameDAO = new MySqlDataAccessGame();
+        } catch (DataAccessException exception) {
+            throw new RuntimeException("Failed to generate sql");
+        }
+        userService = new UserService(userDAO, authDAO);
+        clearService = new ClearService(userDAO, authDAO, gameDAO);
+        gameService = new GameService(gameDAO, authDAO);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here

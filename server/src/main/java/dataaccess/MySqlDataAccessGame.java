@@ -4,21 +4,19 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-//public class MySqlDataAccessGame implements GameDAO {
-public class MySqlDataAccessGame {
+public class MySqlDataAccessGame implements GameDAO {
+
     public MySqlDataAccessGame() throws DataAccessException {
         configureDatabase();
     }
+
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
@@ -124,17 +122,14 @@ public class MySqlDataAccessGame {
     }
 
     public void clear() throws DataAccessException {
-        var statementGameClear = "TRUNCATE TABLE game";
-        executeUpdate(statementGameClear);
+        var statement = "TRUNCATE game";
+        executeUpdate(statement);
     }
 
     public void updateGame(int gameID, GameData game) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
             var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, chessGame=? WHERE gameID=?";
                 String chessJson = new Gson().toJson(game.chess());
                 executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), chessJson, gameID);
-        } catch (SQLException e) {
             throw new DataAccessException("Error updating the Chess Game :(");
-        }
     }
 }

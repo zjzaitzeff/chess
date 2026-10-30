@@ -1,10 +1,7 @@
 package dataaccess;
 import model.AuthData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -93,7 +90,7 @@ public class MySqlDataAccessAuth implements AuthDAO {
         executeUpdate(statement, authToken);
     }
     public void clear() throws DataAccessException {
-        var statementAuthClear = "TRUNCATE TABLE auth";
-        executeUpdate(statementAuthClear);
+        var statement = "TRUNCATE auth";
+        executeUpdate(statement);
     }
 }
