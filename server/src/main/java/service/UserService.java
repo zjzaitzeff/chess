@@ -2,11 +2,14 @@ package service;
 import dataaccess.*;
 import model.UserData;
 import model.AuthData;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.UUID;
 
 public class UserService {
     private final UserDAO users;
     private final AuthDAO authTokens;
+
     public UserService(UserDAO userList, AuthDAO authTokenList) {
         this.users = userList;
         this.authTokens = authTokenList;
@@ -16,6 +19,7 @@ public class UserService {
     }
     public record RegisterResult(String username, String authToken) {}
     public record RegisterRequest(String username, String password, String email) {}
+
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();
         String password = registerRequest.password();
@@ -29,7 +33,8 @@ public class UserService {
             throw new AlreadyTakenException("Error 403: Already Taken");
         }
         // 200 success
-        UserData user = new UserData(username, password, email);
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        UserData user = new UserData(username, hashedPassword, email);
         users.createUser(user);
         String authTokenID = generateToken();
         AuthData authToken = new AuthData(authTokenID, username);

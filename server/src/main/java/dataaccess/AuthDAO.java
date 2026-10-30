@@ -9,7 +9,7 @@ public interface AuthDAO {
 
     AuthData getAuth(String authToken) throws DataAccessException;
 
-    void updateAuth(String authToken, AuthData a) throws DataAccessException;
+//    void updateAuth(String authToken, AuthData a) throws DataAccessException;
 
     void clear() throws DataAccessException;
 }
