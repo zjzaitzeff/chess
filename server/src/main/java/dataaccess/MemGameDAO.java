@@ -9,8 +9,9 @@ public class MemGameDAO implements GameDAO {
     private final Map<Integer, GameData> games = new HashMap<>();
 
     @Override
-    public void createGame(GameData g) {
+    public int createGame(GameData g) {
         games.put(g.gameID(),g);
+        return 0;
     }
 
     @Override

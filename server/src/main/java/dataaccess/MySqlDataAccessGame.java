@@ -66,10 +66,11 @@ public class MySqlDataAccessGame implements GameDAO {
         }
     }
 
-    public void createGame(GameData gameData) throws DataAccessException {
+    public int createGame(GameData gameData) throws DataAccessException {
         var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
         String chessJson = new Gson().toJson(gameData.chess());
         int gameID = executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), chessJson);
+        return gameID;
     }
 
     public GameData getGame(int gameID) throws DataAccessException {
@@ -128,8 +129,7 @@ public class MySqlDataAccessGame implements GameDAO {
 
     public void updateGame(int gameID, GameData game) throws DataAccessException {
             var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, chessGame=? WHERE gameID=?";
-                String chessJson = new Gson().toJson(game.chess());
-                executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), chessJson, gameID);
-            throw new DataAccessException("Error updating the Chess Game :(");
+            String chessJson = new Gson().toJson(game.chess());
+            executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), chessJson, gameID);
     }
 }

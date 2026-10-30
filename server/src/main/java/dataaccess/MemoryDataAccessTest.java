@@ -133,16 +133,16 @@ public class MemoryDataAccessTest {
         assertNull(d.getGame(game.gameID()));
     }
 
-//    @Test
-//    @DisplayName("Update Game")
-//    public void updateGame() {
-//        var d = new MemGameDAO();
-//        var game = generateAndAddGame(d);
-//        var gameTwo = new GameData(5678, "white", "black", "game2", new ChessGame());
-//        d.createGame(gameTwo);
-//        d.updateGame(game.gameID(), gameTwo);
-//        assertEquals(d.getGame(game.gameID()), d.getGame(gameTwo.gameID()));
-//    }
+    @Test
+    @DisplayName("Update Game")
+    public void updateGame() {
+        var d = new MemGameDAO();
+        var game = generateAndAddGame(d);
+        var gameTwo = new GameData(5678, "white", "black", "game2", new ChessGame());
+        d.createGame(gameTwo);
+        d.updateGame(game.gameID(), gameTwo);
+        assertEquals(d.getGame(game.gameID()), d.getGame(gameTwo.gameID()));
+    }
 
     @Test
     @DisplayName("List Games")
