@@ -76,17 +76,6 @@ public class MemoryDataAccessTest {
         assertNull(d.getAuth(authToken.authToken()));
     }
 
-//    @Test
-//    @DisplayName("Update auth")
-//    public void updateAuth() {
-//        var authTokenOne = new AuthData("01234", "cow");
-//        var authTokenTwo = new AuthData("9876", "moo");
-//        var d = new MemAuthDAO();
-//        d.createAuth(authTokenOne);
-//        d.updateAuth("01234",authTokenTwo);
-//        assertNotEquals(authTokenOne, d.getAuth(authTokenTwo.authToken()));
-//    }
-
     @Test
     @DisplayName("Clear auth")
     public void clearAuth() {

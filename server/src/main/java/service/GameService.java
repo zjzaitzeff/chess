@@ -19,16 +19,6 @@ public class GameService {
         this.authTokens = authTokenDAO;
     }
 
-   private int generateGameID() {
-        int gameID = 0;
-        while (tokens.contains(gameID)) {
-            gameID = ThreadLocalRandom.current().nextInt(1000, 10000);
-        }
-        tokens.add(gameID);
-        return gameID;
-
-   }
-
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException {
         String authToken = listGamesRequest.authToken();
         //401 unauthorized
@@ -49,8 +39,6 @@ public class GameService {
         if (authTokens.getAuth(authToken) == null || authToken == null) {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
-        //GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game)
-//        int gameID = generateGameID();
         GameData game = new GameData(0, null,null,gameName,new ChessGame());
         int gameID = games.createGame(game);
         return new CreateGameResult(gameID);

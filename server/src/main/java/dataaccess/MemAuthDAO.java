@@ -20,11 +20,6 @@ public class MemAuthDAO implements AuthDAO {
     public AuthData getAuth(String authToken) {
         return authTokens.get(authToken);
     }
-//
-//    @Override
-//    public void updateAuth(String authToken, AuthData a) {
-//        authTokens.put(authToken, a);
-//    }
 
     @Override
     public void clear() {
