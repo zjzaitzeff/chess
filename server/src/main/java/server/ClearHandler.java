@@ -17,11 +17,8 @@ public class ClearHandler implements Handler {
     @Override
     public void handle(Context context) throws DataAccessException {
         try {
-            var serializer = new Gson();
-            context.contentType("application/json");
             ClearResult clearResult = clearService.clear();
-            var whatToExport = serializer.toJson(clearResult);
-            context.status(200).json(whatToExport);
+            context.status(200).json(clearResult);
         } catch (DataAccessException exception) {
             var error = Map.of("message", exception.getMessage());
             context.status(500);

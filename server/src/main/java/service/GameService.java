@@ -60,7 +60,7 @@ public class GameService {
         String pColor = joinGameRequest.playerColor();
         int gID = joinGameRequest.gameID();
         //400 bad request
-        if (pColor == null || (!pColor.equals("WHITE") && !pColor.equals("BLACK")) || gID <= 1000 || gID > 10000 || games.getGame(gID) == null) {
+        if (pColor == null || (!pColor.equals("WHITE") && !pColor.equals("BLACK")) || gID > 10000 || games.getGame(gID) == null) {
             throw new BadRequestException("Error 400: Bad Request");
         }
         //401 unauthorized
