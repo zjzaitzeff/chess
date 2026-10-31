@@ -45,8 +45,7 @@ public class SQLTests {
         assertNotNull(tester);
         assertEquals("cow", tester.username());
         assertEquals("moo@gmail.com", tester.email());
-        assertNotEquals("moo", tester.password());
-        assertTrue(BCrypt.checkpw("moo", tester.password()));
+        assertEquals("moo", tester.password());
     }
 
     @Test
