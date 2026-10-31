@@ -50,9 +50,9 @@ public class GameService {
             throw new UnauthorizedException("Error 401: Unauthorized");
         }
         //GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game)
-        int gameID = generateGameID();
-        GameData game = new GameData(gameID, null,null,gameName,new ChessGame());
-        games.createGame(game);
+//        int gameID = generateGameID();
+        GameData game = new GameData(0, null,null,gameName,new ChessGame());
+        int gameID = games.createGame(game);
         return new CreateGameResult(gameID);
     }
 

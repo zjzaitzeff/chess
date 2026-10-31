@@ -15,8 +15,8 @@ public class MySqlDataAccessUser implements UserDAO {
     public void createUser(UserData user) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
         String clearTextPassword = user.password();
-        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
-        executeUpdate(statement, user.username(), hashedPassword, user.email());
+//        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+        executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
     public UserData getUser(String username) throws DataAccessException {

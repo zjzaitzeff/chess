@@ -16,13 +16,16 @@ public class ClearHandler implements Handler {
 
     @Override
     public void handle(Context context) throws DataAccessException {
+        var serializer = new Gson();
         try {
+            context.contentType("application/json");
             ClearResult clearResult = clearService.clear();
-            context.status(200).json(clearResult);
+            context.status(200).result(serializer.toJson(clearResult));
         } catch (DataAccessException exception) {
+            context.contentType("application/json");
             var error = Map.of("message", exception.getMessage());
             context.status(500);
-            context.json(error);
+            context.result(serializer.toJson(error));
         }
     }
 }
