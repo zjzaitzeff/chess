@@ -29,6 +29,9 @@ public class ListGamesHandler implements Handler {
             context.status(401);
             var error = Map.of("message", exception.getMessage());
             context.result(serializer.toJson(error));
+        } catch (DataAccessException exception) {
+            var error = Map.of("message", "Error: " + exception.getMessage());
+            context.status(500).result(serializer.toJson(error));
         }
     }
 }

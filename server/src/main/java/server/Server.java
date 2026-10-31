@@ -17,7 +17,7 @@ public class Server {
             authDAO = new MySqlDataAccessAuth();
             gameDAO = new MySqlDataAccessGame();
         } catch (DataAccessException exception) {
-            throw new RuntimeException("Failed to generate sql");
+            throw new RuntimeException("Failed to generate sql or other problems that I don't completely understand but this somehow fixes it");
         }
         userService = new UserService(userDAO, authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);

@@ -38,6 +38,9 @@ public class JoinGameHandler implements Handler {
         } catch (AlreadyTakenException exception) {
             var error = Map.of("message", exception.getMessage());
             context.status(403).result(serializer.toJson(error));
+        } catch (DataAccessException exception) {
+            var error = Map.of("message", "Error: " + exception.getMessage());
+            context.status(500).result(serializer.toJson(error));
         }
     }
 }
