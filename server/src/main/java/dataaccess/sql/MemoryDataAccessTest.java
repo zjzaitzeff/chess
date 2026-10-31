@@ -1,12 +1,14 @@
-package dataaccess;
+package dataaccess.sql;
 
 import chess.ChessGame;
+import dataaccess.MemAuthDAO;
+import dataaccess.MemGameDAO;
+import dataaccess.MemUserDAO;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

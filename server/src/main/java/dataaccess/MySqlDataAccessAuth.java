@@ -6,32 +6,10 @@ import java.sql.*;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class MySqlDataAccessAuth implements AuthDAO {
+public class MySqlDataAccessAuth extends MySqlDataAccessBase implements AuthDAO {
 
     public MySqlDataAccessAuth() throws DataAccessException {
-        configureDatabase();
-    }
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    if (param instanceof String p) {ps.setString(i + 1, p);}
-                    else if (param instanceof Integer p) {ps.setInt(i + 1, p);}
-                    else if (param == null) {ps.setNull(i + 1, NULL);}
-                }
-                ps.executeUpdate();
-
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("Error: unable to update database: %s, %s", statement, e.getMessage()));
-        }
+        configureDatabase(createStatements);
     }
 
     private final String[] createStatements = {
@@ -44,22 +22,10 @@ public class MySqlDataAccessAuth implements AuthDAO {
             """
     };
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Error: Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 
     public void createAuth(AuthData auth) throws DataAccessException {
         var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
-        int id = executeUpdate(statement, auth.authToken(), auth.username());
+        executeUpdate(statement, auth.authToken(), auth.username());
     }
 
     public AuthData getAuth(String authToken) throws DataAccessException {
