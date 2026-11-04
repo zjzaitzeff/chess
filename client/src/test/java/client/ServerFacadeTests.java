@@ -1,6 +1,8 @@
 import org.junit.jupiter.api.*;
 import server.Server;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class ServerFacadeTests {
 
@@ -21,7 +23,13 @@ public class ServerFacadeTests {
 
     @Test
     public void sampleTest() {
-        Assertions.assertTrue(true);
+        assertTrue(true);
     }
+
+//    @Test
+//    void register() throws Exception {
+//        var authData = facade.register("player1", "password", "p1@email.com");
+//        assertTrue(authData.authToken().length() > 10);
+//    }
 
 }

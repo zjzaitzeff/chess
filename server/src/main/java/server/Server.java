@@ -24,7 +24,6 @@ public class Server {
         gameService = new GameService(gameDAO, authDAO);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        // Register your endpoints and exception handlers here
         javalin.delete("/db", new ClearHandler(clearService));
         javalin.post("/user", new RegisterHandler(userService));
         javalin.post("/session", new LoginHandler(userService));
