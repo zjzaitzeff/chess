@@ -98,21 +98,24 @@ public class ClientMain {
     }
 
     private static void postUI(String prefix, Scanner scanner, boolean loggedIn) {
-        //  Help	Displays text informing the user of available actions.
-//  Logout	Logs out the user via the server API and transitions the client back to the Prelogin UI.
-//  Create Game	Prompts the user for a game name and calls the server create API. This creates the game on the server but does not automatically join the user to it.
-//  List Games	Lists all existing games on the server. Calls the server list API and displays the games in a numbered list, including the game name and current players (excluding observers). The list numbering must start at 1 and be independent of the internal game IDs.
-//  Play Game	Allows the user to join a game by specifying the list number and their desired color. The client must map this list number back to the correct internal game ID. Calls the server join API.
-//  Observe Game	Allows the user to specify a game to observe using the list number. The client must map this list number back to the correct internal game ID. (Full observer functionality will be added in Phase 6).
         while (loggedIn) {
             System.out.print(prefix);
             String input = scanner.nextLine();
             if (input.equals("help")) {
                 helpPost();
             } else if (input.equals("logout")) {
+                //needs an authToken probably
                 logout();
             } else if (input.equals("create")) {
-                create();
+                System.out.print("Create format: <NAME>\n");
+                String createInput = scanner.nextLine();
+                String[] createInfo = createInput.trim().split("\\s+");
+                if (createCheck(createInfo)) {
+                    String gameName = createInfo[0];
+                    create(gameName);
+                } else {
+                    System.out.print("Create format incorrect: <NAME>");
+                }
             } else if (input.equals("list")) {
                 list();
             } else if (input.equals("join")) {
@@ -124,9 +127,22 @@ public class ClientMain {
                     int ID = parseInt(strID);
                     String color = joinInfo[1];
                     play(ID, color);
+                } else {
+                    System.out.print("Join format incorrect: <ID> [WHITE|BLACK]");
                 }
             } else if (input.equals("observe")) {
-                observe();
+                System.out.print("observe format: <ID>\n");
+                String observeInput = scanner.nextLine();
+                String[] observeInfo = observeInput.trim().split("\\s+");
+                if (observeCheck(observeInfo)) {
+                    String strID = observeInfo[0];
+                    int ID = parseInt(strID);
+                    observe(ID);
+                } else {
+                    System.out.print("Observe format incorrect: <ID>");
+                }
+            } else {
+                System.out.print("Incorrect input, please use command Help to see correct inputs\n");
             }
         }
     }
@@ -136,19 +152,24 @@ public class ClientMain {
     }
 
     private static void logout() {
-
+        //authToken input
     }
 
-    private static void create() {
+    private static void create(String gameName) {
+        // authToken input
+    }
 
+    private static boolean createCheck(String[] info) {
+        return info.length == 1;
     }
 
     private static void list() {
-
+        // auth token input
     }
 
     private static void play(int ID, String color) {
         // this is the join
+        //needs an authoToken
 
     }
 
@@ -172,7 +193,19 @@ public class ClientMain {
         return true;
     }
 
-    private static void observe() {
+    private static void observe(int ID) {
 
+    }
+
+    private static boolean observeCheck(String[] info) {
+        if (info.length != 1) {
+            return false;
+        }
+        try {
+            Integer.parseInt(info[0]);
+            return true;
+        } catch (NumberFormatException exception) {
+            return false;
+        }
     }
 }
