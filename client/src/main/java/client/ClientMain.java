@@ -14,29 +14,49 @@ public class ClientMain {
         boolean registered = false;
         boolean loggedIn = false;
         String prefix = "[LOGGED OUT] >>> ";
-        String input =" ";
-        if (!registered) {
-            System.out.print("Welcome to 240 chess. Type Help to get started!\n");
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print(prefix);
-                input = scanner.nextLine();
-                if (input.equals("quit")) {
-                    System.out.print("Quiting Game");
-                    System.exit(0);
-                } else if (input.equals("help")) {
-                    help();
-                } else if (input.equals("login")) {
-                    System.out.print("login\n");
-                    //login(username, password);
-                } else if (input.equals("register")) {
-                    System.out.print("register\n");
-                    //register();
+        String input;
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Welcome to 240 chess. Type Help to get started!\n");
+        while (!registered) {
+            System.out.print(prefix);
+            input = scanner.nextLine();
+            if (input.equals("quit")) {
+                System.out.print("Quiting Game");
+                System.exit(0);
+            } else if (input.equals("help")) {
+                help();
+            } else if (input.equals("login")) {
+                System.out.print("login format: <username> <password>");
+                String loginInput = scanner.nextLine();
+                String[] loginInfo = loginInput.trim().split("\\s+");
+                if (loginCheck(loginInfo)) {
+                    String username = loginInfo[0];
+                    String password = loginInfo[1];
+                    login(username, password);
+                    loggedIn = true;
+                    prefix = "[LOGGED IN] >>> ";
                 } else {
-                    System.out.print("incorrect input, please use command Help to see correct inputs\n");
+                    System.out.print("Incorrect input: <username> <password>\nIf you want to login please type login");
                 }
+            } else if (input.equals("register")) {
+                System.out.print("register\n");
+                String registerInput = scanner.nextLine();
+                String[] registerInfo = registerInput.trim().split("\\s+");
+                if (registerCheck(registerInfo)) {
+                    String username = registerInfo[0];
+                    String password = registerInfo[1];
+                    String email = registerInfo[2];
+                    register(username, password, email);
+                    registered = true;
+                } else {
+                    System.out.print("Incorrect input: <username> <password> <email>");
+                }
+            } else {
+                System.out.print("incorrect input, please use command Help to see correct inputs\n");
             }
+
         }
+        scanner.close();
     }
 
     public static void help() {
@@ -47,7 +67,15 @@ public class ClientMain {
         System.out.print("login\n");
     }
 
+    private static boolean loginCheck(String[] info) {
+        return info.length == 2;
+    }
+
     public static void register(String username, String password, String email) {
         System.out.print("register\n");
+    }
+
+    private static boolean registerCheck(String[] info) {
+        return info.length == 3;
     }
 }
