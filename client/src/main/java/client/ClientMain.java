@@ -22,9 +22,11 @@ public class ClientMain {
             if (!loggedIn) {
                 preUI(prefix, loggedIn, scanner);
                 prefix = "[LOGGED IN] >>> ";
+                loggedIn = true;
             } else {
                 postUI(prefix, scanner, loggedIn);
                 prefix = "[LOGGED OUT] >>> ";
+                loggedIn = false;
             }
         }
     }
@@ -52,6 +54,7 @@ public class ClientMain {
                         String username = loginInfo[0];
                         String password = loginInfo[1];
                         login(username, password);
+                        System.out.print("Logged in as: " + username + "\n");
                         loggedIn = true;
                     } else {
                         System.out.print("Incorrect input: <username> <password>\nIf you want to login please type login\n");
@@ -80,7 +83,6 @@ public class ClientMain {
     }
 
     public static void login(String username, String password) {
-        System.out.print("You logged in\n");
         //add login API to server
     }
 
@@ -89,7 +91,6 @@ public class ClientMain {
     }
 
     public static void register(String username, String password, String email) {
-        System.out.print("You registered\n");
         // add register API to server
     }
 
@@ -101,54 +102,57 @@ public class ClientMain {
         while (loggedIn) {
             System.out.print(prefix);
             String input = scanner.nextLine();
-            if (input.equals("help")) {
-                helpPost();
-            } else if (input.equals("logout")) {
-                //needs an authToken probably
-                logout();
-            } else if (input.equals("create")) {
-                System.out.print("Create format: <NAME>\n");
-                String createInput = scanner.nextLine();
-                String[] createInfo = createInput.trim().split("\\s+");
-                if (createCheck(createInfo)) {
-                    String gameName = createInfo[0];
-                    create(gameName);
-                } else {
-                    System.out.print("Create format incorrect: <NAME>");
+            switch (input) {
+                case "help" -> helpPost();
+                case "logout" -> {
+                    //needs an authToken probably
+                    logout();
+                    loggedIn = false;
                 }
-            } else if (input.equals("list")) {
-                list();
-            } else if (input.equals("join")) {
-                System.out.print("join format: <ID> [WHITE|BLACK]\n");
-                String joinInput = scanner.nextLine();
-                String[] joinInfo = joinInput.trim().split("\\s+");
-                if (joinCheck(joinInfo)) {
-                    String strID = joinInfo[0];
-                    int ID = parseInt(strID);
-                    String color = joinInfo[1];
-                    play(ID, color);
-                } else {
-                    System.out.print("Join format incorrect: <ID> [WHITE|BLACK]");
+                case "create" -> {
+                    System.out.print("Create format: <NAME>\n");
+                    String createInput = scanner.nextLine();
+                    String[] createInfo = createInput.trim().split("\\s+");
+                    if (createCheck(createInfo)) {
+                        String gameName = createInfo[0];
+                        create(gameName);
+                    } else {
+                        System.out.print("Create format incorrect: <NAME>\n");
+                    }
                 }
-            } else if (input.equals("observe")) {
-                System.out.print("observe format: <ID>\n");
-                String observeInput = scanner.nextLine();
-                String[] observeInfo = observeInput.trim().split("\\s+");
-                if (observeCheck(observeInfo)) {
-                    String strID = observeInfo[0];
-                    int ID = parseInt(strID);
-                    observe(ID);
-                } else {
-                    System.out.print("Observe format incorrect: <ID>");
+                case "list" -> list();
+                case "join" -> {
+                    System.out.print("join format: <ID> [WHITE|BLACK]\n");
+                    String joinInput = scanner.nextLine();
+                    String[] joinInfo = joinInput.trim().split("\\s+");
+                    if (joinCheck(joinInfo)) {
+                        String strID = joinInfo[0];
+                        int ID = parseInt(strID);
+                        String color = joinInfo[1];
+                        play(ID, color);
+                    } else {
+                        System.out.print("Join format incorrect: <ID> [WHITE|BLACK]\n");
+                    }
                 }
-            } else {
-                System.out.print("Incorrect input, please use command Help to see correct inputs\n");
+                case "observe" -> {
+                    System.out.print("observe format: <ID>\n");
+                    String observeInput = scanner.nextLine();
+                    String[] observeInfo = observeInput.trim().split("\\s+");
+                    if (observeCheck(observeInfo)) {
+                        String strID = observeInfo[0];
+                        int ID = parseInt(strID);
+                        observe(ID);
+                    } else {
+                        System.out.print("Observe format incorrect: <ID>\n");
+                    }
+                }
+                default -> System.out.print("Incorrect input, please use command Help to see correct inputs\n");
             }
         }
     }
 
     private static void helpPost() {
-        System.out.print("create - Create a game\nlist - list games\n join - join a game\nobserve - observe a game\nlogout - For when done, access to return to pre-logout menu\nhelp - possible commands");
+        System.out.print("create - Create a game\nlist - list games\njoin - join a game\nobserve - observe a game\nlogout - For when done, access to return to pre-logout menu\nhelp - possible commands\n");
     }
 
     private static void logout() {
