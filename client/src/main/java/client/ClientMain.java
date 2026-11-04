@@ -1,6 +1,8 @@
 package client;
 import java.util.Scanner;
 import chess.*;
+
+import static java.lang.Integer.parseInt;
 // prelogin UI
 //Help	Displays text informing the user of available actions.
 // Quit	Exits the program.
@@ -27,15 +29,19 @@ public class ClientMain {
         }
     }
 
+    private static void quit(Scanner scanner) {
+        System.out.print("Quiting Game");
+        scanner.close();
+        System.exit(0);
+    }
+
     private static void preUI(String prefix, boolean loggedIn, Scanner scanner) {
         while (!loggedIn) {
             System.out.print(prefix);
             String input = scanner.nextLine();
             switch (input) {
                 case "quit" -> {
-                    System.out.print("Quiting Game");
-                    scanner.close();
-                    System.exit(0);
+                    quit(scanner);
                 }
                 case "help" -> helpPre();
                 case "login" -> {
@@ -109,8 +115,16 @@ public class ClientMain {
                 create();
             } else if (input.equals("list")) {
                 list();
-            } else if (input.equals("play")) {
-                play();
+            } else if (input.equals("join")) {
+                System.out.print("join format: <ID> [WHITE|BLACK]\n");
+                String joinInput = scanner.nextLine();
+                String[] joinInfo = joinInput.trim().split("\\s+");
+                if (joinCheck(joinInfo)) {
+                    String strID = joinInfo[0];
+                    int ID = parseInt(strID);
+                    String color = joinInfo[1];
+                    play(ID, color);
+                }
             } else if (input.equals("observe")) {
                 observe();
             }
@@ -118,7 +132,7 @@ public class ClientMain {
     }
 
     private static void helpPost() {
-
+        System.out.print("create - Create a game\nlist - list games\n join - join a game\nobserve - observe a game\nlogout - For when done, access to return to pre-logout menu\nhelp - possible commands");
     }
 
     private static void logout() {
@@ -133,8 +147,29 @@ public class ClientMain {
 
     }
 
-    private static void play() {
+    private static void play(int ID, String color) {
+        // this is the join
 
+    }
+
+    private static boolean joinCheck(String[] info) {
+        if (info.length != 2) {
+            return false;
+        }
+        boolean isNum;
+        try {
+            Integer.parseInt(info[0]);
+            isNum = true;
+        } catch (NumberFormatException exception) {
+            isNum = false;
+        }
+        if (!isNum) {
+            return false;
+        }
+        if (!info[1].equals("WHITE") && !info[1].equals("BLACK")) {
+            return false;
+        }
+        return true;
     }
 
     private static void observe() {
