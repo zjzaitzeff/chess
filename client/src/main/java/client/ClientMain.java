@@ -12,13 +12,19 @@ public class ClientMain {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Client: " + piece);
         boolean loggedIn = false;
+        boolean notDoneWithProgram = true;
         String prefix = "[LOGGED OUT] >>> ";
         Scanner scanner = new Scanner(System.in);
         System.out.print("Welcome to 240 chess. Type help to get started!\n");
-        preUI(prefix, loggedIn, scanner);
-        prefix = "[LOGGED IN] >>> ";
-        postUI();
-        scanner.close();
+        while (true) {
+            if (!loggedIn) {
+                preUI(prefix, loggedIn, scanner);
+                prefix = "[LOGGED IN] >>> ";
+            } else {
+                postUI(prefix, scanner, loggedIn);
+                prefix = "[LOGGED OUT] >>> ";
+            }
+        }
     }
 
     private static void preUI(String prefix, boolean loggedIn, Scanner scanner) {
@@ -28,9 +34,10 @@ public class ClientMain {
             switch (input) {
                 case "quit" -> {
                     System.out.print("Quiting Game");
+                    scanner.close();
                     System.exit(0);
                 }
-                case "help" -> help();
+                case "help" -> helpPre();
                 case "login" -> {
                     System.out.print("login format: <username> <password>\n");
                     String loginInput = scanner.nextLine();
@@ -62,24 +69,13 @@ public class ClientMain {
         }
     }
 
-    private static void postUI() {
-        //  Help	Displays text informing the user of available actions.
-//  Logout	Logs out the user via the server API and transitions the client back to the Prelogin UI.
-//  Create Game	Prompts the user for a game name and calls the server create API. This creates the game on the server but does not automatically join the user to it.
-//  List Games	Lists all existing games on the server. Calls the server list API and displays the games in a numbered list, including the game name and current players (excluding observers). The list numbering must start at 1 and be independent of the internal game IDs.
-//  Play Game	Allows the user to join a game by specifying the list number and their desired color. The client must map this list number back to the correct internal game ID. Calls the server join API.
-//  Observe Game	Allows the user to specify a game to observe using the list number. The client must map this list number back to the correct internal game ID. (Full observer functionality will be added in Phase 6).
-
-    }
-
-    public static void help() {
+    public static void helpPre() {
         System.out.print("register - create a user\nlogin - to play chess\nquit - Stop playing chess\nhelp - review this message again\n");
     }
 
     public static void login(String username, String password) {
         System.out.print("You logged in\n");
-        System.out.print(username);
-        System.out.print(password);
+        //add login API to server
     }
 
     private static boolean loginCheck(String[] info) {
@@ -88,12 +84,60 @@ public class ClientMain {
 
     public static void register(String username, String password, String email) {
         System.out.print("You registered\n");
-        System.out.print(username);
-        System.out.print(password);
-        System.out.print(email);
+        // add register API to server
     }
 
     private static boolean registerCheck(String[] info) {
         return info.length == 3;
+    }
+
+    private static void postUI(String prefix, Scanner scanner, boolean loggedIn) {
+        //  Help	Displays text informing the user of available actions.
+//  Logout	Logs out the user via the server API and transitions the client back to the Prelogin UI.
+//  Create Game	Prompts the user for a game name and calls the server create API. This creates the game on the server but does not automatically join the user to it.
+//  List Games	Lists all existing games on the server. Calls the server list API and displays the games in a numbered list, including the game name and current players (excluding observers). The list numbering must start at 1 and be independent of the internal game IDs.
+//  Play Game	Allows the user to join a game by specifying the list number and their desired color. The client must map this list number back to the correct internal game ID. Calls the server join API.
+//  Observe Game	Allows the user to specify a game to observe using the list number. The client must map this list number back to the correct internal game ID. (Full observer functionality will be added in Phase 6).
+        while (loggedIn) {
+            System.out.print(prefix);
+            String input = scanner.nextLine();
+            if (input.equals("help")) {
+                helpPost();
+            } else if (input.equals("logout")) {
+                logout();
+            } else if (input.equals("create")) {
+                create();
+            } else if (input.equals("list")) {
+                list();
+            } else if (input.equals("play")) {
+                play();
+            } else if (input.equals("observe")) {
+                observe();
+            }
+        }
+    }
+
+    private static void helpPost() {
+
+    }
+
+    private static void logout() {
+
+    }
+
+    private static void create() {
+
+    }
+
+    private static void list() {
+
+    }
+
+    private static void play() {
+
+    }
+
+    private static void observe() {
+
     }
 }
