@@ -1,15 +1,10 @@
 package client;
 import java.util.Scanner;
 import chess.*;
-
 import static java.lang.Integer.parseInt;
-// prelogin UI
-//Help	Displays text informing the user of available actions.
-// Quit	Exits the program.
-// Login	Prompts the user for login credentials and calls the server login API. Upon success, the client transitions to the Postlogin UI.
-// Register	Prompts the user for registration information and calls the server register API. Upon success, the user is logged in and the client transitions to the Postlogin UI.
 
 public class ClientMain {
+    private static String authToken = null;
     public static void main(String[] args) {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Client: " + piece);
