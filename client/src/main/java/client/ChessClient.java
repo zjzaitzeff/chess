@@ -98,7 +98,6 @@ public class ChessClient {
             authToken = loginResult.authToken();
             return true;
         } catch (DataAccessException exception) {
-            System.out.print("Login failed :(\n");
             return false;
         }
     }
