@@ -17,5 +17,4 @@ public class ClientMain {
             System.out.print("Unable to start server: %s%n");
         }
     }
-
 }

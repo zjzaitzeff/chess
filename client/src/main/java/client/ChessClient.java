@@ -59,9 +59,12 @@ public class ChessClient {
                     if (loginCheck(loginInfo)) {
                         String username = loginInfo[0];
                         String password = loginInfo[1];
-                        login(username, password);
-                        System.out.print("Logged in as: " + username + "\n");
-                        loggedIn = true;
+                        if (login(username, password)) {
+                            loggedIn = true;
+                            System.out.print("Logged in as: " + username + "\n");
+                        } else {
+                            System.out.print("Login failed due to token issue, make sure you are registered");
+                        }
                     } else {
                         System.out.print("Incorrect input: <username> <password>\nIf you want to login please type login\n");
                     }
@@ -88,14 +91,16 @@ public class ChessClient {
         System.out.print("register - create a user\nlogin - to play chess\nquit - Stop playing chess\nhelp - review this message again\n");
     }
 
-    public static void login(String username, String password) {
+    public static boolean login(String username, String password) {
         try {
             LoginRequest loginRequest = new LoginRequest(username, password);
             LoginResult loginResult = facade.login(loginRequest);
             authToken = loginResult.authToken();
-            System.out.print("Successfully logged in: " + loginResult.username());
+            System.out.print("Successfully logged in: " + loginResult.username() + "\n");
+            return true;
         } catch (DataAccessException exception) {
-            System.out.print("Login failed :(");
+            System.out.print("Login failed :(\n");
+            return false;
         }
     }
 
@@ -108,9 +113,9 @@ public class ChessClient {
             UserService.RegisterRequest registerRequest = new UserService.RegisterRequest(username, password, email);
             UserService.RegisterResult registerResult = facade.register(registerRequest);
             authToken = registerResult.authToken();
-            System.out.print("Registered: " + registerResult.username());
+            System.out.print("Registered: " + registerResult.username() + "\n");
         } catch (DataAccessException exception) {
-            System.out.print("Registration failed, try again");
+            System.out.print("Registration failed, try again\n");
         }
     }
 
@@ -180,9 +185,9 @@ public class ChessClient {
             LogoutRequest logoutRequest = new LogoutRequest(authToken);
             LogoutResult logoutResult = facade.logout(logoutRequest);
             authToken = null;
-            System.out.print("Successfully logged out");
+            System.out.print("Successfully logged out" +"\n");
         } catch (DataAccessException exception) {
-            System.out.print("Logout failed try again");
+            System.out.print("Logout failed try again"+ "\n");
         }
     }
 
@@ -190,9 +195,9 @@ public class ChessClient {
         try {
             CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
             CreateGameResult createGameResult = facade.createGame(createGameRequest, authToken);
-            System.out.print("Successfully created game! Game ID: " + createGameResult.gameID());
+            System.out.print("Successfully created game! Game ID: " + createGameResult.gameID()+ "\n");
         } catch (DataAccessException exception) {
-            System.out.print("Create game failed, try again");
+            System.out.print("Create game failed, try again"+"\n");
         }
     }
 
@@ -201,13 +206,12 @@ public class ChessClient {
     }
 
     private static void list() {
-        // auth token input
         try {
             ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
             ListGamesResult listGamesResult = facade.listGames(listGamesRequest);
-            System.out.print(listGamesResult.games());
+            System.out.print(listGamesResult.games()+"\n");
         } catch (DataAccessException exception) {
-            System.out.print("List games failed, try again");
+            System.out.print("List games failed, try again"+"\n");
         }
     }
 
@@ -215,9 +219,9 @@ public class ChessClient {
         try {
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, ID);
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
-            System.out.print("Joined game: initiate gamplay");
+            System.out.print("Joined game: initiate gameplay"+"\n");
         } catch (DataAccessException exception) {
-            System.out.print("Failed to join game: try again");
+            System.out.print("Failed to join game: try again"+"\n");
         }
     }
 
@@ -226,7 +230,7 @@ public class ChessClient {
             ClearResult clearResult = facade.clear();
             //System.out.print("Successfully cleared the databases");
         } catch (DataAccessException exception) {
-            System.out.print("Clear game failed, try again");
+            System.out.print("Clear game failed, try again"+"\n");
         }
     }
 

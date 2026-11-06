@@ -33,8 +33,7 @@ public class MySqlDataAccessGame extends MySqlDataAccessBase implements GameDAO 
     public int createGame(GameData gameData) throws DataAccessException {
         var statement = "INSERT INTO game (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
         String chessJson = new Gson().toJson(gameData.chess());
-        int gameID = executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), chessJson);
-        return gameID;
+        return executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), chessJson);
     }
 
     public GameData getGame(int gameID) throws DataAccessException {

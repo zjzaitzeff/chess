@@ -68,7 +68,10 @@ public class ServerFacadeTests {
 
     @Test
     void clear() throws Exception {
-
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        CreateGameResult cgr = createGame(rr);
+        facade.clear();
     }
 
     private LoginResult login() throws Exception {
