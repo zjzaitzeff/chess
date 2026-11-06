@@ -96,7 +96,6 @@ public class ChessClient {
             LoginRequest loginRequest = new LoginRequest(username, password);
             LoginResult loginResult = facade.login(loginRequest);
             authToken = loginResult.authToken();
-            System.out.print("Successfully logged in: " + loginResult.username() + "\n");
             return true;
         } catch (DataAccessException exception) {
             System.out.print("Login failed :(\n");
