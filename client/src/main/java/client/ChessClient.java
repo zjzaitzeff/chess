@@ -172,7 +172,7 @@ public class ChessClient {
     }
 
     private static void helpPost() {
-        System.out.print("create - Create a game\nlist - list games\njoin - join a game\nobserve - observe a game\nlogout - For when done, access to return to pre-logout menu\nhelp - possible commands\n");
+        System.out.print("create - Create a game\nlist - list games\njoin - join a game\nobserve - observe a game\nlogout - For when done, access to return to pre-login menu\nhelp - possible commands\n");
     }
 
     private static void logout() {
@@ -189,7 +189,7 @@ public class ChessClient {
     private static void create(String gameName) {
         try {
             CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
-            CreateGameResult createGameResult = facade.createGame(createGameRequest);
+            CreateGameResult createGameResult = facade.createGame(createGameRequest, authToken);
             System.out.print("Successfully created game! Game ID: " + createGameResult.gameID());
         } catch (DataAccessException exception) {
             System.out.print("Create game failed, try again");
@@ -214,7 +214,7 @@ public class ChessClient {
     private static void play(int ID, String color) {
         try {
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, ID);
-            JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
+            JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
             System.out.print("Joined game: initiate gamplay");
         } catch (DataAccessException exception) {
             System.out.print("Failed to join game: try again");

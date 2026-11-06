@@ -33,25 +33,25 @@ public class ServerFacade {
     }
 
     public LogoutResult logout(LogoutRequest logoutRequest) throws DataAccessException {
-        var request = buildRequest("DELETE", "/session", logoutRequest);
+        var request = buildRequestAuth("DELETE", "/session",null, logoutRequest.authToken());
         var response = sendRequest(request);
         return handleResponse(response, LogoutResult.class);
     }
 
-    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
-        var request = buildRequest("POST", "/game", createGameRequest);
+    public CreateGameResult createGame(CreateGameRequest createGameRequest, String authToken) throws DataAccessException {
+        var request = buildRequestAuth("POST", "/game", createGameRequest, authToken);
         var response = sendRequest(request);
         return handleResponse(response, CreateGameResult.class);
     }
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws DataAccessException {
-        var request = buildRequest("GET", "/game", listGamesRequest);
+        var request = buildRequestAuth("GET", "/game", null, listGamesRequest.authToken());
         var response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
     }
 
-    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
-        var request = buildRequest("PUT", "/game", joinGameRequest);
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String authToken) throws DataAccessException {
+        var request = buildRequestAuth("PUT", "/game", joinGameRequest, authToken);
         var response = sendRequest(request);
         return handleResponse(response, JoinGameResult.class);
     }
@@ -63,6 +63,19 @@ public class ServerFacade {
                 .method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        return request.build();
+    }
+
+    private HttpRequest buildRequestAuth(String method, String path, Object body, String authToken) {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + path))
+                .method(method, makeRequestBody(body));
+        if (body != null) {
+            request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.setHeader("authorization", authToken);
         }
         return request.build();
     }

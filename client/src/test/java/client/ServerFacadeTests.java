@@ -32,7 +32,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void register() throws Exception {
+    void registerTest() throws Exception {
         UserService.RegisterRequest registerRequest = new UserService.RegisterRequest("player1", "password", "p1@email.com");
         var authData = facade.register(registerRequest);
         assertTrue(authData.authToken().length() > 10);
@@ -46,6 +46,51 @@ public class ServerFacadeTests {
         assertThrows(Exception.class, () -> facade.register(registerRequestTwo));
     }
 
+    private UserService.RegisterResult register() throws Exception {
+        UserService.RegisterRequest registerRequest = new UserService.RegisterRequest("player1", "password", "p1@email.com");
+        return facade.register(registerRequest);
+    }
+
+    @Test
+    void loginTest() throws Exception {
+        register();
+        LoginResult loginResult = facade.login(new LoginRequest("player1", "password"));
+        assertEquals("player1", loginResult.username());
+        assertNotNull(loginResult.authToken());
+    }
+
+    @Test
+    void loginFail() throws Exception {
+        register();
+        LoginResult loginResult = facade.login(new LoginRequest("player1", "password"));
+        assertThrows(Exception.class, () -> facade.login(new LoginRequest("player1", "moo")));
+    }
+
+    @Test
+    void clear() throws Exception {
+
+    }
+
+    private LoginResult login() throws Exception {
+        return facade.login(new LoginRequest("player1", "password"));
+    }
+
+    @Test
+    void logout () throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        LogoutRequest logoutRequest = new LogoutRequest(lr.authToken());
+        LogoutResult logoutResult = facade.logout(logoutRequest);
+        assertNotNull(logoutResult);
+    }
+
+    @Test
+    void logoutFail() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        LogoutRequest logoutRequestTest = new LogoutRequest("fakeAuthToken");
+        assertThrows(Exception.class, () -> facade.logout(logoutRequestTest));
+    }
 
 
 }
