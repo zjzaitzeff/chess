@@ -26,6 +26,7 @@ public class ServerFacade {
         var response = sendRequest(request);
         return handleResponse(response, LoginResult.class);
     }
+
     public ClearResult clear() throws DataAccessException {
         var request = buildRequest("DELETE", "/db", null);
         var response = sendRequest(request);

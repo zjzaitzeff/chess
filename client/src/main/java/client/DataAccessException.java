@@ -24,9 +24,9 @@ public class DataAccessException extends RuntimeException {
 
     public static DataAccessException fromJson(String json) {
         var map = new Gson().fromJson(json, HashMap.class);
-        var status = Code.valueOf(map.get("status").toString());
+//        var status = Code.valueOf(map.get("status").toString());
         String message = map.get("message").toString();
-        return new DataAccessException(status, message);
+        return new DataAccessException(Code.ServerError, message);
     }
 
     public Code code() {

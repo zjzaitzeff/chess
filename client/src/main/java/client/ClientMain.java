@@ -15,6 +15,7 @@ public class ClientMain {
             new ChessClient(serverURL).run();
         } catch(Throwable exception) {
             System.out.print("Unable to start server: %s%n");
+            throw exception;
         }
     }
 }
