@@ -88,7 +88,6 @@ public class ChessClient {
     }
 
     public static void login(String username, String password) {
-        //add login API to server
         try {
             LoginRequest loginRequest = new LoginRequest(username, password);
             LoginResult loginResult = facade.login(loginRequest);
@@ -176,11 +175,24 @@ public class ChessClient {
     }
 
     private static void logout() {
-        //authToken input
+        try {
+            LogoutRequest logoutRequest = new LogoutRequest(authToken);
+            LogoutResult logoutResult = facade.logout(logoutRequest);
+            authToken = null;
+            System.out.print("Successfully logged out");
+        } catch (DataAccessException exception) {
+            System.out.print("Logout failed try again");
+        }
     }
 
     private static void create(String gameName) {
-        // authToken input
+        try {
+            CreateGameRequest createGameRequest = new CreateGameRequest(gameName);
+            CreateGameResult createGameResult = facade.createGame(createGameRequest);
+            System.out.print("Successfully created game! Game ID: " + createGameResult.gameID());
+        } catch (DataAccessException exception) {
+            System.out.print("Create game failed, try again");
+        }
     }
 
     private static boolean createCheck(String[] info) {
@@ -189,12 +201,23 @@ public class ChessClient {
 
     private static void list() {
         // auth token input
+        try {
+            ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+            ListGamesResult listGamesResult = facade.listGames(listGamesRequest);
+            System.out.print(listGamesResult.games());
+        } catch (DataAccessException exception) {
+            System.out.print("List games failed, try again");
+        }
     }
 
     private static void play(int ID, String color) {
-        // this is the join
-        //needs an authoToken
-
+        try {
+            JoinGameRequest joinGameRequest = new JoinGameRequest(color, ID);
+            JoinGameResult joinGameResult = facade.joinGame(joinGameRequest);
+            System.out.print("Joined game: initiate gamplay");
+        } catch (DataAccessException exception) {
+            System.out.print("Failed to join game: try again");
+        }
     }
 
     private static boolean joinCheck(String[] info) {

@@ -26,7 +26,6 @@ public class ServerFacade {
         var response = sendRequest(request);
         return handleResponse(response, LoginResult.class);
     }
-//        javalin.put("/game", new JoinGameHandler(gameService));
     public ClearResult clear() throws DataAccessException {
         var request = buildRequest("DELETE", "/db", null);
         var response = sendRequest(request);
