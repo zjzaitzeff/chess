@@ -11,16 +11,16 @@ public class ServerFacadeTests {
     private static Server server;
     private static ServerFacade facade;
 
-    @BeforeAll
-    public static void init() {
+    @BeforeEach
+    public void init() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:"+port);
     }
 
-    @AfterAll
-    static void stopServer() {
+    @AfterEach
+    void stopServer() {
         facade.clear();
         server.stop();
     }
@@ -90,6 +90,85 @@ public class ServerFacadeTests {
         LoginResult lr = login();
         LogoutRequest logoutRequestTest = new LogoutRequest("fakeAuthToken");
         assertThrows(Exception.class, () -> facade.logout(logoutRequestTest));
+    }
+
+    @Test
+    void createGameSuccess() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        CreateGameResult createGameResult = facade.createGame(new CreateGameRequest("cow"),rr.authToken());
+        assertNotNull(createGameResult);
+    }
+
+    @Test
+    void createGameFail() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        assertThrows(Exception.class, () -> facade.createGame(new CreateGameRequest("cow"),"FakeAuthToken"));
+    }
+
+    @Test
+    void createGameBad() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        assertThrows(Exception.class, () -> facade.createGame(new CreateGameRequest(""),"FakeAuthToken"));
+    }
+
+    private CreateGameResult createGame(UserService.RegisterResult rr) throws Exception {
+        return facade.createGame(new CreateGameRequest("cow"),rr.authToken());
+    }
+
+    @Test
+    void listGamesSuccess() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        CreateGameResult cgr = createGame(rr);
+        ListGamesRequest listGamesRequest = new ListGamesRequest(rr.authToken());
+        ListGamesResult listGamesResult = facade.listGames(listGamesRequest);
+        assertNotNull(listGamesResult.games());
+    }
+
+    @Test
+    void listGamesFail() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        CreateGameResult cgr = createGame(rr);
+        ListGamesRequest listGamesRequest = new ListGamesRequest("fakeAuth");
+        assertThrows(Exception.class, () -> facade.listGames(listGamesRequest));
+    }
+
+    @Test
+    void joinGameSuccess() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        CreateGameResult cgr = createGame(rr);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("BLACK", cgr.gameID());
+        JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, rr.authToken());
+        assertNotNull(joinGameResult);
+        JoinGameRequest joinGameRequestTwo = new JoinGameRequest("WHITE", cgr.gameID());
+        JoinGameResult joinGameResultTwo = facade.joinGame(joinGameRequestTwo, rr.authToken());
+        assertNotNull(joinGameResultTwo);
+    }
+
+    @Test
+    void joinGameBadAuth() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        CreateGameResult cgr = createGame(rr);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("BLACK", cgr.gameID());
+        assertThrows(Exception.class, () -> facade.joinGame(joinGameRequest, "fakeAuthToken"));
+    }
+
+    @Test
+    void joinGameSameColor() throws Exception {
+        UserService.RegisterResult rr = register();
+        LoginResult lr = login();
+        CreateGameResult cgr = createGame(rr);
+        JoinGameRequest joinGameRequest = new JoinGameRequest("BLACK", cgr.gameID());
+        JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, rr.authToken());
+        assertNotNull(joinGameResult);
+        JoinGameRequest joinGameRequestTwo = new JoinGameRequest("BLACK", cgr.gameID());
+        assertThrows(Exception.class, () -> facade.joinGame(joinGameRequestTwo, rr.authToken()));
     }
 
 

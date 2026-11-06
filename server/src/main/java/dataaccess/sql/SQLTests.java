@@ -171,7 +171,7 @@ public class SQLTests {
 
     @Test
     @DisplayName("Update Game")
-    public void upadteGameSuccess() throws DataAccessException {
+    public void updateGameSuccess() throws DataAccessException {
         var g2 = new GameData(5678, "white", "black", "game2", new ChessGame());
         MySqlDataAccessGame sql = createSQLGame();
         int gameID = sql.createGame(g2);
