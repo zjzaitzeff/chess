@@ -39,6 +39,7 @@ public class ChessClient {
     private static void quit(Scanner scanner) {
         System.out.print("Quiting Game");
         scanner.close();
+        clearDataBase();
         System.exit(0);
     }
 
@@ -217,6 +218,15 @@ public class ChessClient {
             System.out.print("Joined game: initiate gamplay");
         } catch (DataAccessException exception) {
             System.out.print("Failed to join game: try again");
+        }
+    }
+
+    private static void clearDataBase() {
+        try {
+            ClearResult clearResult = facade.clear();
+            //System.out.print("Successfully cleared the databases");
+        } catch (DataAccessException exception) {
+            System.out.print("Clear game failed, try again");
         }
     }
 
