@@ -5,7 +5,18 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
 import com.google.gson.Gson;
-import service.*;
+import service.UserService;
+import service.LoginResult;
+import service.LoginRequest;
+import service.ClearResult;
+import service.LogoutResult;
+import service.LogoutRequest;
+import service.CreateGameRequest;
+import service.CreateGameResult;
+import service.ListGamesRequest;
+import service.ListGamesResult;
+import service.JoinGameRequest;
+import service.JoinGameResult;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
