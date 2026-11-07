@@ -198,7 +198,13 @@ public class ChessClient {
     }
 
     private static void helpPost() {
-        System.out.print("create - Create a game\nlist - list games\njoin - join a game\nobserve - observe a game\nlogout - For when done, access to return to pre-login menu\nhelp - possible commands\n");
+        System.out.print("create - Create a game\nhelp - possible commands\n");
+        System.out.print("list - list games\n");
+        System.out.print("join - join a game\n");
+        System.out.print("observe - observe a game\n");
+        System.out.print("logout - For when done, access to return to pre-login menu\n");
+        System.out.print("help - possible commands\n");
+
     }
 
     private static void logout() {
