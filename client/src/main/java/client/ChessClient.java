@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import model.GameData;
@@ -26,6 +27,7 @@ public class ChessClient {
         String prefix = "[LOGGED OUT] >>> ";
         Scanner scanner = new Scanner(System.in);
         System.out.print("Welcome to 240 chess. Type help to get started!\n");
+        printBoard(new ChessGame(), "WHITE");
         while (true) {
             if (!loggedIn) {
                 preUI(prefix, loggedIn, scanner);
@@ -47,7 +49,7 @@ public class ChessClient {
 
     private static void preUI(String prefix, boolean loggedIn, Scanner scanner) {
         while (!loggedIn) {
-            System.out.print(prefix);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK +prefix);
             String input = scanner.nextLine();
             switch (input) {
                 case "quit" -> {
@@ -125,7 +127,7 @@ public class ChessClient {
 
     private static void postUI(String prefix, Scanner scanner, boolean loggedIn) {
         while (loggedIn) {
-            System.out.print(prefix);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + prefix);
             String input = scanner.nextLine();
             switch (input) {
                 case "help" -> helpPost();
@@ -262,8 +264,31 @@ public class ChessClient {
     }
 
     private static void printBoard(ChessGame game, String color) {
+        ChessBoard board = game.getBoard();
         if (color.equals("WHITE")) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + "  A  B  C  D  E  F  G  H  \n");
+            for (int i = 8; i > 0; i--) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i);
+                if (i % 2 == 0) {
+                    printWhiteRow(board, i);
+                } else {
+                    printBlackRow(board);
+                }
+                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i + "\n");
+            }
+            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + "  A  B  C  D  E  F  G  H  \n");
+        }
+    }
 
+    private static void printWhiteRow(ChessBoard board, int r) {
+        for (int j = 1; j < 9; j++) {
+            System.out.print(" F ");
+        }
+    }
+
+    private static void printBlackRow(ChessBoard board) {
+        for (int j = 1; j < 9; j++) {
+            System.out.print(" F ");
         }
     }
 
