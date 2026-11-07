@@ -5,7 +5,8 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
 import com.google.gson.Gson;
-import service.UserService;
+import service.UserService.RegisterRequest;
+import service.UserService.RegisterResult;
 import service.LoginResult;
 import service.LoginRequest;
 import service.ClearResult;
@@ -26,10 +27,10 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public UserService.RegisterResult register(UserService.RegisterRequest registerRequest) throws DataAccessException {
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         var request = buildRequest("POST", "/user", registerRequest);
         var response = sendRequest(request);
-        return handleResponse(response, UserService.RegisterResult.class);
+        return handleResponse(response, RegisterResult.class);
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {

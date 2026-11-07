@@ -5,7 +5,8 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
-import service.UserService;
+import service.UserService.RegisterRequest;
+import service.UserService.RegisterResult;
 import service.LoginResult;
 import service.LoginRequest;
 import service.ClearResult;
@@ -121,8 +122,8 @@ public class ChessClient {
 
     public static void register(String username, String password, String email) {
         try {
-            UserService.RegisterRequest registerRequest = new UserService.RegisterRequest(username, password, email);
-            UserService.RegisterResult registerResult = facade.register(registerRequest);
+            RegisterRequest registerRequest = new RegisterRequest(username, password, email);
+            RegisterResult registerResult = facade.register(registerRequest);
             authToken = registerResult.authToken();
             System.out.print("Registered: " + registerResult.username() + "\n");
         } catch (DataAccessException exception) {
