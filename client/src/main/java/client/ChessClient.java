@@ -164,9 +164,9 @@ public class ChessClient {
                     String[] joinInfo = joinInput.trim().split("\\s+");
                     if (joinCheck(joinInfo)) {
                         String strID = joinInfo[0];
-                        int ID = parseInt(strID);
+                        int id = parseInt(strID);
                         String color = joinInfo[1];
-                        play(ID, color);
+                        play(id, color);
                     } else {
                         System.out.print("Join format incorrect: <ID> [WHITE|BLACK]\n");
                     }
@@ -176,9 +176,9 @@ public class ChessClient {
                     String observeInput = scanner.nextLine();
                     String[] observeInfo = observeInput.trim().split("\\s+");
                     if (observeCheck(observeInfo)) {
-                        String strID = observeInfo[0];
-                        int ID = parseInt(strID);
-                        observe(ID);
+                        String strId = observeInfo[0];
+                        int id = parseInt(strId);
+                        observe(id);
                     } else {
                         System.out.print("Observe format incorrect: <ID>\n");
                     }
@@ -245,12 +245,12 @@ public class ChessClient {
         }
     }
 
-    private static void play(int ID, String color) {
+    private static void play(int id, String color) {
         try {
-            JoinGameRequest joinGameRequest = new JoinGameRequest(color, ID);
+            JoinGameRequest joinGameRequest = new JoinGameRequest(color, id);
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
             System.out.print("Joined game: initiating gameplay"+"\n");
-            ChessGame game = getGame(ID);
+            ChessGame game = getGame(id);
             assert game != null;
             printBoard(game, color);
         } catch (DataAccessException exception) {
@@ -258,12 +258,12 @@ public class ChessClient {
         }
     }
 
-    private static ChessGame getGame(int ID) {
+    private static ChessGame getGame(int id) {
         try {
             ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
             ListGamesResult listGamesResult = facade.listGames(listGamesRequest);
             for (GameData game : listGamesResult.games()) {
-                if (game.gameID() == ID) {
+                if (game.gameID() == id) {
                     return game.chess();
                 }
             }
@@ -400,8 +400,8 @@ public class ChessClient {
         return info[1].equals("WHITE") || info[1].equals("BLACK");
     }
 
-    private static void observe(int ID) {
-        ChessGame game = getGame(ID);
+    private static void observe(int id) {
+        ChessGame game = getGame(id);
         assert game != null;
         printBoard(game, "WHITE");
     }
