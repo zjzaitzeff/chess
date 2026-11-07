@@ -1,7 +1,6 @@
 package service;
 import dataaccess.*;
-import model.UserData;
-import model.AuthData;
+import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
@@ -17,8 +16,6 @@ public class UserService {
     private static String generateToken() {
         return UUID.randomUUID().toString();
     }
-    public record RegisterResult(String username, String authToken) {}
-    public record RegisterRequest(String username, String password, String email) {}
 
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String username = registerRequest.username();

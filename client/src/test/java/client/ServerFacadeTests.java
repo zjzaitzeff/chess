@@ -1,7 +1,7 @@
 import client.ServerFacade;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
-import service.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,21 +33,21 @@ public class ServerFacadeTests {
 
     @Test
     void registerTest() throws Exception {
-        UserService.RegisterRequest registerRequest = new UserService.RegisterRequest("player1", "password", "p1@email.com");
+        RegisterRequest registerRequest = new RegisterRequest("player1", "password", "p1@email.com");
         var authData = facade.register(registerRequest);
         assertTrue(authData.authToken().length() > 10);
     }
 
     @Test
     void registerFail() throws Exception {
-        UserService.RegisterRequest registerRequest = new UserService.RegisterRequest("player1", "password", "p1@email.com");
+        RegisterRequest registerRequest = new RegisterRequest("player1", "password", "p1@email.com");
         var authData = facade.register(registerRequest);
-        UserService.RegisterRequest registerRequestTwo = new UserService.RegisterRequest("player1", "password", "p1@email.com");
+        RegisterRequest registerRequestTwo = new RegisterRequest("player1", "password", "p1@email.com");
         assertThrows(Exception.class, () -> facade.register(registerRequestTwo));
     }
 
-    private UserService.RegisterResult register() throws Exception {
-        UserService.RegisterRequest registerRequest = new UserService.RegisterRequest("player1", "password", "p1@email.com");
+    private RegisterResult register() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest("player1", "password", "p1@email.com");
         return facade.register(registerRequest);
     }
 
@@ -68,7 +68,7 @@ public class ServerFacadeTests {
 
     @Test
     void clear() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         CreateGameResult cgr = createGame(rr);
         facade.clear();
@@ -80,7 +80,7 @@ public class ServerFacadeTests {
 
     @Test
     void logout () throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         LogoutRequest logoutRequest = new LogoutRequest(lr.authToken());
         LogoutResult logoutResult = facade.logout(logoutRequest);
@@ -89,7 +89,7 @@ public class ServerFacadeTests {
 
     @Test
     void logoutFail() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         LogoutRequest logoutRequestTest = new LogoutRequest("fakeAuthToken");
         assertThrows(Exception.class, () -> facade.logout(logoutRequestTest));
@@ -97,7 +97,7 @@ public class ServerFacadeTests {
 
     @Test
     void createGameSuccess() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         CreateGameResult createGameResult = facade.createGame(new CreateGameRequest("cow"),rr.authToken());
         assertNotNull(createGameResult);
@@ -105,25 +105,25 @@ public class ServerFacadeTests {
 
     @Test
     void createGameFail() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         assertThrows(Exception.class, () -> facade.createGame(new CreateGameRequest("cow"),"FakeAuthToken"));
     }
 
     @Test
     void createGameBad() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         assertThrows(Exception.class, () -> facade.createGame(new CreateGameRequest(""),"FakeAuthToken"));
     }
 
-    private CreateGameResult createGame(UserService.RegisterResult rr) throws Exception {
+    private CreateGameResult createGame(RegisterResult rr) throws Exception {
         return facade.createGame(new CreateGameRequest("cow"),rr.authToken());
     }
 
     @Test
     void listGamesSuccess() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         CreateGameResult cgr = createGame(rr);
         ListGamesRequest listGamesRequest = new ListGamesRequest(rr.authToken());
@@ -133,7 +133,7 @@ public class ServerFacadeTests {
 
     @Test
     void listGamesFail() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         CreateGameResult cgr = createGame(rr);
         ListGamesRequest listGamesRequest = new ListGamesRequest("fakeAuth");
@@ -142,7 +142,7 @@ public class ServerFacadeTests {
 
     @Test
     void joinGameSuccess() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         CreateGameResult cgr = createGame(rr);
         JoinGameRequest joinGameRequest = new JoinGameRequest("BLACK", cgr.gameID());
@@ -155,7 +155,7 @@ public class ServerFacadeTests {
 
     @Test
     void joinGameBadAuth() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         CreateGameResult cgr = createGame(rr);
         JoinGameRequest joinGameRequest = new JoinGameRequest("BLACK", cgr.gameID());
@@ -164,7 +164,7 @@ public class ServerFacadeTests {
 
     @Test
     void joinGameSameColor() throws Exception {
-        UserService.RegisterResult rr = register();
+        RegisterResult rr = register();
         LoginResult lr = login();
         CreateGameResult cgr = createGame(rr);
         JoinGameRequest joinGameRequest = new JoinGameRequest("BLACK", cgr.gameID());

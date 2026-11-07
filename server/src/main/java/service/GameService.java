@@ -1,13 +1,11 @@
 package service;
 import chess.ChessGame;
-import model.AuthData;
-import model.GameData;
+import model.*;
 import dataaccess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class GameService {
     private final GameDAO games;

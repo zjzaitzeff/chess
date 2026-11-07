@@ -3,6 +3,8 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
+import model.ListGamesRequest;
+import model.ListGamesResult;
 import service.*;
 import io.javalin.http.Handler;
 

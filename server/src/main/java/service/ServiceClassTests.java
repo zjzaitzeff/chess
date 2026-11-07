@@ -1,15 +1,9 @@
 package service;
 import static org.junit.jupiter.api.Assertions.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import chess.ChessGame;
 import dataaccess.*;
-import model.AuthData;
-import model.GameData;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +12,7 @@ public class ServiceClassTests {
     @Test
     @DisplayName("Register Bad Request")
     public void registerBadRequest() {
-        UserService.RegisterRequest practiceRequest = new UserService.RegisterRequest("",null, null);
+        RegisterRequest practiceRequest = new RegisterRequest("",null, null);
         UserDAO userDAO = new MemUserDAO();
         AuthDAO authDAO = new MemAuthDAO();
         UserService userService = new UserService(userDAO,authDAO);
@@ -30,12 +24,12 @@ public class ServiceClassTests {
     @Test
     @DisplayName("Register Already Taken")
     public void registerAlreadyTaken() throws DataAccessException {
-        UserService.RegisterRequest practiceRequest = new UserService.RegisterRequest("Cow","Moo", "Cow@byu.edu");
-        UserService.RegisterRequest practiceRequestGood = new UserService.RegisterRequest("Cow", "Quack", "Liar@byu.edu");
+        RegisterRequest practiceRequest = new RegisterRequest("Cow","Moo", "Cow@byu.edu");
+        RegisterRequest practiceRequestGood = new RegisterRequest("Cow", "Quack", "Liar@byu.edu");
         UserDAO userDAO = new MemUserDAO();
         AuthDAO authDAO = new MemAuthDAO();
         UserService userService = new UserService(userDAO,authDAO);
-        UserService.RegisterResult registerResult = userService.register(practiceRequestGood);
+        RegisterResult registerResult = userService.register(practiceRequestGood);
         Assertions.assertThrows(AlreadyTakenException.class, () -> {
             userService.register(practiceRequest);
         });
@@ -44,11 +38,11 @@ public class ServiceClassTests {
     @Test
     @DisplayName("Register Success")
     public void registerSuccess() throws DataAccessException {
-        UserService.RegisterRequest practiceRequest = new UserService.RegisterRequest("Cow","Moo", "Cow@byu.edu");
+        RegisterRequest practiceRequest = new RegisterRequest("Cow","Moo", "Cow@byu.edu");
         UserDAO userDAO = new MemUserDAO();
         AuthDAO authDAO = new MemAuthDAO();
         UserService userService = new UserService(userDAO,authDAO);
-        UserService.RegisterResult registerResult = userService.register(practiceRequest);
+        RegisterResult registerResult = userService.register(practiceRequest);
         // user added to users, authToken added to users, registerResult created
         assertNotNull(userDAO.getUser(registerResult.username()));
         assertNotNull(authDAO.getAuth(registerResult.authToken()));
@@ -72,11 +66,11 @@ public class ServiceClassTests {
     @DisplayName("Login Unauthorized")
     public void loginUnauthorized() throws DataAccessException {
         LoginRequest practiceRequest = new LoginRequest("Cow", "Quack");
-        UserService.RegisterRequest practiceRequestRegister = new UserService.RegisterRequest("Cow","Moo", "Cow@byu.edu");
+        RegisterRequest practiceRequestRegister = new RegisterRequest("Cow","Moo", "Cow@byu.edu");
         UserDAO userDAO = new MemUserDAO();
         AuthDAO authDAO = new MemAuthDAO();
         UserService userService = new UserService(userDAO,authDAO);
-        UserService.RegisterResult registerResult = userService.register(practiceRequestRegister);
+        RegisterResult registerResult = userService.register(practiceRequestRegister);
         Assertions.assertThrows(UnauthorizedException.class, () -> {
            userService.login(practiceRequest);
         });
@@ -86,11 +80,11 @@ public class ServiceClassTests {
     @DisplayName("Login Success")
     public void loginSuccess() throws DataAccessException {
         LoginRequest practiceRequest = new LoginRequest("Cow", "Moo");
-        UserService.RegisterRequest practiceRequestRegister = new UserService.RegisterRequest("Cow","Moo", "Cow@byu.edu");
+        RegisterRequest practiceRequestRegister = new RegisterRequest("Cow","Moo", "Cow@byu.edu");
         UserDAO userDAO = new MemUserDAO();
         AuthDAO authDAO = new MemAuthDAO();
         UserService userService = new UserService(userDAO,authDAO);
-        UserService.RegisterResult registerResult = userService.register(practiceRequestRegister);
+        RegisterResult registerResult = userService.register(practiceRequestRegister);
         LoginResult loginResult = userService.login(practiceRequest);
         // creates authToken, returns loginResult
         assertNotNull(authDAO.getAuth(loginResult.authToken()));
@@ -115,11 +109,11 @@ public class ServiceClassTests {
     @DisplayName("Logout Success")
     public void logoutSuccess() throws DataAccessException {
         LoginRequest practiceRequestLogin = new LoginRequest("Cow", "Moo");
-        UserService.RegisterRequest practiceRequestRegister = new UserService.RegisterRequest("Cow","Moo", "Cow@byu.edu");
+        RegisterRequest practiceRequestRegister = new RegisterRequest("Cow","Moo", "Cow@byu.edu");
         UserDAO userDAO = new MemUserDAO();
         AuthDAO authDAO = new MemAuthDAO();
         UserService userService = new UserService(userDAO,authDAO);
-        UserService.RegisterResult registerResult = userService.register(practiceRequestRegister);
+        RegisterResult registerResult = userService.register(practiceRequestRegister);
         LoginResult loginResult = userService.login(practiceRequestLogin);
         // delete token and return LogoutResult
         LogoutResult logoutResult = userService.logout(new LogoutRequest(loginResult.authToken()));

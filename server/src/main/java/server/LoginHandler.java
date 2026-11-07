@@ -2,6 +2,8 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.http.Context;
+import model.LoginRequest;
+import model.LoginResult;
 import service.*;
 import io.javalin.http.Handler;
 import java.util.Map;

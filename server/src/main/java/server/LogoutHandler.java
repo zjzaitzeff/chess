@@ -1,8 +1,9 @@
 package server;
-import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
+import model.LogoutRequest;
+import model.LogoutResult;
 import service.*;
 import io.javalin.http.Handler;
 import com.google.gson.Gson;

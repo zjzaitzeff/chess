@@ -1,5 +1,7 @@
 package service;
 import dataaccess.*;
+import model.ClearResult;
+
 public class ClearService {
     private final AuthDAO authTokens;
     private final UserDAO users;

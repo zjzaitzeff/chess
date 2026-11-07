@@ -4,6 +4,7 @@ import dataaccess.*;
 import io.javalin.http.Context;
 import service.*;
 import io.javalin.http.Handler;
+import model.*;
 
 import java.util.Map;
 
@@ -20,8 +21,8 @@ public class RegisterHandler implements Handler {
         context.contentType("application/json");
         try {
             var jsonInfo = context.body();
-            UserService.RegisterRequest registerRequest = serializer.fromJson(jsonInfo, UserService.RegisterRequest.class);
-            UserService.RegisterResult registerResult = userService.register(registerRequest);
+            RegisterRequest registerRequest = serializer.fromJson(jsonInfo, RegisterRequest.class);
+            RegisterResult registerResult = userService.register(registerRequest);
             var whatToExport = serializer.toJson(registerResult);
             context.status(200).json(whatToExport);
         } catch (BadRequestException exception) {

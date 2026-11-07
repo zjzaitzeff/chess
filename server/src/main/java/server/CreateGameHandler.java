@@ -4,6 +4,8 @@ import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
+import model.CreateGameRequest;
+import model.CreateGameResult;
 import service.*;
 import io.javalin.http.Handler;
 
