@@ -5,8 +5,6 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
 import com.google.gson.Gson;
-import model.RegisterRequest;
-import model.RegisterResult;
 import model.LoginResult;
 import model.LoginRequest;
 import model.ClearResult;
@@ -18,6 +16,8 @@ import model.ListGamesRequest;
 import model.ListGamesResult;
 import model.JoinGameRequest;
 import model.JoinGameResult;
+import model.RegisterRequest;
+import model.RegisterResult;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
