@@ -305,44 +305,43 @@ public class ChessClient {
 
     private static void printWhiteRowWhite(ChessBoard board, int r) {
         for (int j = 1; j < 9; j++) {
-            if (j % 2 == 0) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
-            } else {
-                System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
-            }
+            whiteRowHelper(board,r,j);
         }
     }
 
     private static void printBlackRowWhite(ChessBoard board, int r) {
         for (int j = 1; j < 9; j++) {
-            if (j % 2 == 0) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
-            } else {
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
-            }
+            blackRowHelper(board, r, j);
         }
     }
 
     private static void printWhiteRowBlack(ChessBoard board, int r) {
         for (int j = 8; j > 0; j --) {
-            if (j % 2 == 0) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
-            } else {
-                System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
-            }
+            whiteRowHelper(board,r,j);
         }
     }
 
     private static void printBlackRowBlack(ChessBoard board, int r) {
         for (int j = 8; j > 0; j --) {
-            if (j % 2 == 0) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
-            } else {
-                System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
-            }
+            blackRowHelper(board, r, j);
         }
     }
 
+    private static void blackRowHelper(ChessBoard board, int r, int j) {
+        if (j % 2 == 0) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
+        } else {
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
+        }
+    }
+
+    private static void whiteRowHelper(ChessBoard board, int r, int j) {
+        if (j % 2 == 0) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
+        } else {
+            System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
+        }
+    }
     private static String getPieceStr(ChessBoard board, int r, int c) {
         ChessPiece p = board.getPiece(new ChessPosition(r,c));
         if (p == null) {
