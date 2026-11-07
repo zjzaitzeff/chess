@@ -27,7 +27,6 @@ public class ChessClient {
     private static String authToken = null;
     private static ServerFacade facade;
 
-
     public ChessClient(String serverURL) {
         facade = new ServerFacade(serverURL);
     }
@@ -38,6 +37,8 @@ public class ChessClient {
         String prefix = "[LOGGED OUT] >>> ";
         Scanner scanner = new Scanner(System.in);
         System.out.print("Type help to get started!\n");
+//        printBoard(new ChessGame(), "WHITE");
+//        printBoard(new ChessGame(), "BLACK");
         while (true) {
             if (!loggedIn) {
                 preUI(prefix, loggedIn, scanner);
@@ -71,16 +72,7 @@ public class ChessClient {
                     String loginInput = scanner.nextLine();
                     String[] loginInfo = loginInput.trim().split("\\s+");
                     if (loginCheck(loginInfo)) {
-                        String username = loginInfo[0];
-                        String password = loginInfo[1];
-                        if (login(username, password)) {
-                            loggedIn = true;
-                            System.out.print("Logged in as: " + username + "\n");
-                        } else {
-                            System.out.print("Login failed due to token issue, make sure you are registered\n");
-                        }
-                    } else {
-                        System.out.print("Incorrect input: <username> <password>\nIf you want to login please type login\n");
+                        loggedIn = loginHelper(loginInfo);
                     }
                 }
                 case "register" -> {
@@ -98,6 +90,23 @@ public class ChessClient {
                 }
                 default -> System.out.print("incorrect input, please use command Help to see correct inputs\n");
             }
+        }
+    }
+
+    private static boolean loginHelper(String[] loginInfo) {
+        if (loginCheck(loginInfo)) {
+            String username = loginInfo[0];
+            String password = loginInfo[1];
+            if (login(username, password)) {
+                System.out.print("Logged in as: " + username + "\n");
+                return true;
+            } else {
+                System.out.print("Login failed due to token issue, make sure you are registered\n");
+                return false;
+            }
+        } else {
+            System.out.print("Incorrect input: <username> <password>\nIf you want to login please type login\n");
+            return false;
         }
     }
 
