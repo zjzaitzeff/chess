@@ -7,8 +7,6 @@ import chess.ChessPosition;
 import model.GameData;
 import service.*;
 import ui.EscapeSequences;
-
-import java.util.Collection;
 import java.util.Scanner;
 
 import static java.lang.Integer.parseInt;
@@ -387,10 +385,7 @@ public class ChessClient {
         if (!isNum) {
             return false;
         }
-        if (!info[1].equals("WHITE") && !info[1].equals("BLACK")) {
-            return false;
-        }
-        return true;
+        return info[1].equals("WHITE") || info[1].equals("BLACK");
     }
 
     private static void observe(int ID) {

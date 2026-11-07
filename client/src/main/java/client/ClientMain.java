@@ -1,9 +1,4 @@
 package client;
-import java.util.Scanner;
-import chess.*;
-import service.*;
-
-import static java.lang.Integer.parseInt;
 
 public class ClientMain {
     public static void main(String[] args) {
