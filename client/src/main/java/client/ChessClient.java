@@ -3,6 +3,7 @@ package client;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 import model.GameData;
 import service.*;
 import ui.EscapeSequences;
@@ -22,12 +23,11 @@ public class ChessClient {
     }
 
     public void run() {
-        System.out.println("♕ 240 Chess Client: ");
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "♕ 240 Chess Client: ");
         boolean loggedIn = false;
         String prefix = "[LOGGED OUT] >>> ";
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Welcome to 240 chess. Type help to get started!\n");
-        printBoard(new ChessGame(), "WHITE");
+        System.out.print("Type help to get started!\n");
         while (true) {
             if (!loggedIn) {
                 preUI(prefix, loggedIn, scanner);
@@ -272,7 +272,7 @@ public class ChessClient {
                 if (i % 2 == 0) {
                     printWhiteRow(board, i);
                 } else {
-                    printBlackRow(board);
+                    printBlackRow(board, i);
                 }
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i + "\n");
             }
@@ -283,20 +283,51 @@ public class ChessClient {
     private static void printWhiteRow(ChessBoard board, int r) {
         for (int j = 1; j < 9; j++) {
             if (j % 2 == 0) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_BLUE + " B ");
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_BLUE + getPieceStr(board, r, j));
             } else {
-                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_RED + " W ");
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_RED + getPieceStr(board, r, j));
             }
         }
     }
 
-    private static void printBlackRow(ChessBoard board) {
+    private static void printBlackRow(ChessBoard board, int r) {
         for (int j = 1; j < 9; j++) {
             if (j % 2 == 0) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLUE + " W ");
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLUE + getPieceStr(board, r, j));
             } else {
-                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_RED + " B ");
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_RED + getPieceStr(board, r, j));
             }
+        }
+    }
+
+    private static String getPieceStr(ChessBoard board, int r, int c) {
+        ChessPiece p = board.getPiece(new ChessPosition(r,c));
+        if (p == null) {
+            return "   ";
+        } else if (p.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
+            return EscapeSequences.SET_TEXT_COLOR_BLUE + pieceSelect(p);
+        } else {
+            return EscapeSequences.SET_TEXT_COLOR_RED + pieceSelect(p);
+        }
+    }
+
+    private static String pieceSelect(ChessPiece piece) {
+        if (piece == null) {
+            return "   ";
+        } else if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN)) {
+            return " P ";
+        } else if (piece.getPieceType().equals(ChessPiece.PieceType.ROOK)) {
+            return " R ";
+        } else if (piece.getPieceType().equals(ChessPiece.PieceType.KNIGHT)) {
+            return " N ";
+        } else if (piece.getPieceType().equals(ChessPiece.PieceType.BISHOP)) {
+            return " B ";
+        } else if (piece.getPieceType().equals(ChessPiece.PieceType.QUEEN)) {
+            return " Q ";
+        } else if (piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
+            return " K ";
+        } else {
+            return "   ";
         }
     }
 
