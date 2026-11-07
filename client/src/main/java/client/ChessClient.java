@@ -282,13 +282,21 @@ public class ChessClient {
 
     private static void printWhiteRow(ChessBoard board, int r) {
         for (int j = 1; j < 9; j++) {
-            System.out.print(" F ");
+            if (j % 2 == 0) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_BLUE + " B ");
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_RED + " W ");
+            }
         }
     }
 
     private static void printBlackRow(ChessBoard board) {
         for (int j = 1; j < 9; j++) {
-            System.out.print(" F ");
+            if (j % 2 == 0) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_WHITE + EscapeSequences.SET_TEXT_COLOR_BLUE + " W ");
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_RED + " B ");
+            }
         }
     }
 
