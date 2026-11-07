@@ -2,8 +2,11 @@ package client;
 
 import chess.ChessGame;
 import chess.ChessPiece;
+import model.GameData;
 import service.*;
+import ui.EscapeSequences;
 
+import java.util.Collection;
 import java.util.Scanner;
 
 import static java.lang.Integer.parseInt;
@@ -12,15 +15,14 @@ public class ChessClient {
     private static String authToken = null;
     private static ServerFacade facade;
 
+
     public ChessClient(String serverURL) {
         facade = new ServerFacade(serverURL);
     }
 
     public void run() {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        System.out.println("♕ 240 Chess Client: ");
         boolean loggedIn = false;
-        boolean notDoneWithProgram = true;
         String prefix = "[LOGGED OUT] >>> ";
         Scanner scanner = new Scanner(System.in);
         System.out.print("Welcome to 240 chess. Type help to get started!\n");
@@ -63,7 +65,7 @@ public class ChessClient {
                             loggedIn = true;
                             System.out.print("Logged in as: " + username + "\n");
                         } else {
-                            System.out.print("Login failed due to token issue, make sure you are registered");
+                            System.out.print("Login failed due to token issue, make sure you are registered\n");
                         }
                     } else {
                         System.out.print("Incorrect input: <username> <password>\nIf you want to login please type login\n");
@@ -207,9 +209,27 @@ public class ChessClient {
         try {
             ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
             ListGamesResult listGamesResult = facade.listGames(listGamesRequest);
-            System.out.print(listGamesResult.games()+"\n");
+            listHelper(listGamesResult);
         } catch (DataAccessException exception) {
             System.out.print("List games failed, try again"+"\n");
+        }
+    }
+
+    private static void listHelper(ListGamesResult lgr) {
+        for (GameData game : lgr.games()) {
+            String whiteUser;
+            String blackUser;
+            if (game.whiteUsername() == null) {
+                whiteUser = "Open Spot";
+            } else {
+                whiteUser = game.whiteUsername();
+            }
+            if (game.blackUsername() == null) {
+                blackUser = "Open Spot";
+            } else {
+                blackUser = game.blackUsername();
+            }
+            System.out.print("GameID: " + game.gameID() + " White Player: " + whiteUser + " Black Player: " + blackUser +"\n");
         }
     }
 
@@ -217,9 +237,33 @@ public class ChessClient {
         try {
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, ID);
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
-            System.out.print("Joined game: initiate gameplay"+"\n");
+            System.out.print("Joined game: initiating gameplay"+"\n");
+            ChessGame game = getGame(ID);
+            printBoard(game, color);
         } catch (DataAccessException exception) {
             System.out.print("Failed to join game: try again"+"\n");
+        }
+    }
+
+    private static ChessGame getGame(int ID) {
+        try {
+            ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+            ListGamesResult listGamesResult = facade.listGames(listGamesRequest);
+            for (GameData game : listGamesResult.games()) {
+                if (game.gameID() == ID) {
+                    return game.chess();
+                }
+            }
+        } catch (DataAccessException exception) {
+            System.out.print("gameID was incorrect"+"\n");
+            return null;
+        }
+        return null;
+    }
+
+    private static void printBoard(ChessGame game, String color) {
+        if (color.equals("WHITE")) {
+
         }
     }
 
@@ -253,7 +297,8 @@ public class ChessClient {
     }
 
     private static void observe(int ID) {
-
+        ChessGame game = getGame(ID);
+        printBoard(game, "WHITE");
     }
 
     private static boolean observeCheck(String[] info) {
