@@ -84,6 +84,12 @@ public class ChessClient {
                         String password = registerInfo[1];
                         String email = registerInfo[2];
                         register(username, password, email);
+                        if (login(username, password)) {
+                            System.out.print("Logged in as: " + username + "\n");
+                            loggedIn = true;
+                        } else {
+                            System.out.print("Registered but failed to login\n");
+                        }
                     } else {
                         System.out.print("Incorrect input: <username> <password> <email>\nIf you want to register please type register\n");
                     }
@@ -256,7 +262,7 @@ public class ChessClient {
             } else {
                 blackUser = game.blackUsername();
             }
-            System.out.print("GameID: " + game.gameID() + " White Player: " + whiteUser + " Black Player: " + blackUser +"\n");
+            System.out.print("GameID: " + game.gameID() + " Game Name: " + game.gameName() + " White Player: " + whiteUser + " Black Player: " + blackUser +"\n");
         }
     }
 
@@ -416,8 +422,12 @@ public class ChessClient {
 
     private static void observe(int id) {
         ChessGame game = getGame(id);
-        assert game != null;
-        printBoard(game, "WHITE");
+        if (game == null) {
+            System.out.print("Game ID incorrect, create another game or use list to see available games\n");
+        }
+        else {
+            printBoard(game, "WHITE");
+        }
     }
 
     private static boolean observeCheck(String[] info) {
