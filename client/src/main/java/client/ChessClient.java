@@ -262,7 +262,7 @@ public class ChessClient {
             } else {
                 blackUser = game.blackUsername();
             }
-            System.out.print("GameID: " + game.gameID() + " Game Name: " + game.gameName() + " White Player: " + whiteUser + " Black Player: " + blackUser +"\n");
+            System.out.print("GameID: " + game.gameID() + EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName() + EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser + EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser +"\n");
         }
     }
 
