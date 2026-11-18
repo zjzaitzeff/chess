@@ -19,6 +19,10 @@ import model.JoinGameResult;
 import model.RegisterRequest;
 import model.RegisterResult;
 import ui.EscapeSequences;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 import static java.lang.Integer.parseInt;
@@ -181,7 +185,7 @@ public class ChessClient {
                         String strID = joinInfo[0];
                         int id = parseInt(strID);
                         String color = joinInfo[1];
-                        play(id, color);
+                        play(id, color, scanner);
                     } else {
                         System.out.print("Join format incorrect: <ID> [WHITE|BLACK]\n");
                     }
@@ -266,17 +270,89 @@ public class ChessClient {
         }
     }
 
-    private static void play(int id, String color) {
+    private static void play(int id, String color, Scanner scanner) {
         try {
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, id);
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
             System.out.print("Joined game: initiating gameplay"+"\n");
             ChessGame game = getGame(id);
-            assert game != null;
-            printBoard(game, color);
+            gameplay(color, game, true, scanner);
+//            assert game != null;
+//            printBoard(game, color);
         } catch (DataAccessException exception) {
             System.out.print("Failed to join game: try again"+"\n");
         }
+    }
+
+    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner) {
+        //help - display options
+        //redraw chess board - redraws chessboard
+        //leave - return to post UI
+        // Make Move - make a move
+        // Resign - Doesn't leave but ends game
+        // Highlight legal Moves - input piece for which they want to highlight legal moves, the selected pieces's current square and all squares it can legally move are highlighted.
+        boolean resigned = false;
+        boolean wantsToLeave = false;
+        while (!wantsToLeave) {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
+            String input = scanner.nextLine();
+            if (input.equals("help")) {
+                helpGameplay();
+            } else if (input.equals("redraw chess board")) {
+                printBoard(game, color);
+            } else if (input.equals("leave")) {
+                wantsToLeave = true;
+                System.out.print("You have left the game. Returning to menu\n");
+            } else if (input.equals("make move")) {
+                System.out.print("Move format <row piece><col piece> <row target><col target> Ex: e2 e4\n");
+                String makeMoveInput = scanner.nextLine();
+                if (makeMoveCheck(makeMoveInput)) {
+                    System.out.print("will make move " + makeMoveInput + "\n");
+                }
+            } else if (input.equals("resign")) {
+                resigned = true;
+                System.out.print(color + " resigned. Game Over\n");
+            } else if (input.equals("highlight legal moves")) {
+
+            } else {
+                System.out.print("Incorrect input, type help for option\n");
+            }
+        }
+    }
+
+    private static boolean makeMoveCheck(String input) {
+        Collection<String> approvedLetters = List.of("a", "b", "c", "d", "e", "f", "g", "h");
+        Collection<String> approvedNumbers = List.of("1", "2", "3", "4", "5", "6", "7", "8");
+        if (input.length() != 5) {
+            return false;
+        }
+        char thing1 = input.charAt(0);
+        char thing2 = input.charAt(1);
+        char thing3 = input.charAt(2);
+        char thing4 = input.charAt(3);
+        char thing5 = input.charAt(4);
+        if (!approvedLetters.contains(String.valueOf(thing1))) {
+            return false;
+        }
+        if (!approvedNumbers.contains(String.valueOf(thing2))) {
+            return false;
+        }
+        if (!String.valueOf(thing3).equals(" ")) {
+            return false;
+        }
+        if (!approvedLetters.contains(String.valueOf(thing4))) {
+            return false;
+        }
+        return approvedNumbers.contains(String.valueOf(thing5));
+    }
+
+    private static void helpGameplay() {
+        System.out.print("help - Display possible options\n");
+        System.out.print("redraw chess board - redraws chessboard\n");
+        System.out.print("leave - leave the game and return to previous menu\n");
+        System.out.print("make move - make a move\n");
+        System.out.print("resign - resign *does not leave gameplay*\n");
+        System.out.print("highlight legal moves - indicate legal moves\n");
     }
 
     private static ChessGame getGame(int id) {

@@ -1,6 +1,7 @@
 package server;
 import io.javalin.*;
 import dataaccess.*;
+import server.websocket.WebSocketHandler;
 import service.*;
 
 public class Server {
@@ -11,6 +12,7 @@ public class Server {
     private final UserService userService;
     private final ClearService clearService;
     private final GameService gameService;
+    private final WebSocketHandler webSocketHandler;
     public Server() {
         try {
             userDAO = new MySqlDataAccessUser();
@@ -22,8 +24,8 @@ public class Server {
         userService = new UserService(userDAO, authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         gameService = new GameService(gameDAO, authDAO);
+        webSocketHandler = new WebSocketHandler();
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-
         javalin.delete("/db", new ClearHandler(clearService));
         javalin.post("/user", new RegisterHandler(userService));
         javalin.post("/session", new LoginHandler(userService));
@@ -31,6 +33,11 @@ public class Server {
         javalin.get("/game", new ListGamesHandler(gameService));
         javalin.post("/game", new CreateGameHandler(gameService));
         javalin.put("/game", new JoinGameHandler(gameService));
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
     }
 
     public int run(int desiredPort) {

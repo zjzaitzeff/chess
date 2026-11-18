@@ -2,6 +2,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.*;
 import io.javalin.http.Context;
+import server.websocket.WebSocketHandler;
 import service.*;
 import io.javalin.http.Handler;
 import model.*;
