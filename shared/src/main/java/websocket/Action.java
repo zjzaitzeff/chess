@@ -2,7 +2,7 @@ package websocket;
 
 import com.google.gson.Gson;
 
-public record Action(Type type, String visitorName) {
+public record Action(Type type, String visitorName, String color, boolean isPlayer) {
     public enum Type {
         ENTER,
         EXIT,

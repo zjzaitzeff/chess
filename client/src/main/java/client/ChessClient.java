@@ -34,6 +34,7 @@ public class ChessClient implements NotificationHandler {
     private static String authToken = null;
     private static ServerFacade facade;
     private static WebSocketFacade ws = null;
+    private static String currUsername= null;
 
     public ChessClient(String serverURL) {
         facade = new ServerFacade(serverURL);
@@ -132,6 +133,7 @@ public class ChessClient implements NotificationHandler {
             LoginRequest loginRequest = new LoginRequest(username, password);
             LoginResult loginResult = facade.login(loginRequest);
             authToken = loginResult.authToken();
+            currUsername = username;
             return true;
         } catch (DataAccessException exception) {
             return false;
@@ -277,9 +279,9 @@ public class ChessClient implements NotificationHandler {
         try {
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, id);
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
-            System.out.print("Joined game: initiating gameplay"+"\n");
+//            System.out.print("Joined game: initiating gameplay"+"\n");
             ChessGame game = getGame(id);
-            //gameplay(color, game, true, scanner, username);
+            gameplay(color, game, true, scanner);
 //            assert game != null;
 //            printBoard(game, color);
         } catch (DataAccessException exception) {
@@ -287,7 +289,7 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
-    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner, String username) {
+    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner) {
         //help - display options
         //redraw chess board - redraws chessboard
         //leave - return to post UI
@@ -297,13 +299,13 @@ public class ChessClient implements NotificationHandler {
         //ws.joinGame();
         boolean gameOver = false;
         boolean wantsToLeave = false;
-
+        ws.joinGame(currUsername, color, isPlayer);
         while (!wantsToLeave) {
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
             String input = scanner.nextLine();
             switch (input) {
                 case "help" -> helpGameplay();
-                case "redraw chess board" -> printBoard(game, color);
+                case "redraw" -> printBoard(game, color);
                 case "leave" -> {
                     wantsToLeave = true;
                     System.out.print("You have left the game. Returning to menu\n");
@@ -319,7 +321,7 @@ public class ChessClient implements NotificationHandler {
                     gameOver = true;
                     System.out.print(color + " resigned. Game Over\n");
                 }
-                case "highlight legal moves" -> {
+                case "highlight" -> {
                 }
                 default -> System.out.print("Incorrect input, type help for option\n");
             }
@@ -354,11 +356,11 @@ public class ChessClient implements NotificationHandler {
 
     private static void helpGameplay() {
         System.out.print("help - Display possible options\n");
-        System.out.print("redraw chess board - redraws chessboard\n");
+        System.out.print("redraw - redraws chessboard\n");
         System.out.print("leave - leave the game and return to previous menu\n");
         System.out.print("make move - make a move\n");
         System.out.print("resign - resign *does not leave gameplay*\n");
-        System.out.print("highlight legal moves - indicate legal moves\n");
+        System.out.print("highlight- indicate legal moves\n");
     }
 
     private static ChessGame getGame(int id) {

@@ -41,9 +41,9 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void joinGame(String username) {
+    public void joinGame(String username, String color, boolean isPlayer) {
         try {
-            var action = new Action(Action.Type.ENTER, username);
+            var action = new Action(Action.Type.ENTER, username, color, isPlayer);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException exception) {
             throw new DataAccessException(DataAccessException.Code.ServerError, exception.getMessage());
@@ -52,7 +52,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void leaveGame(String username) {
         try {
-            var action = new Action(Action.Type.EXIT, username);
+            var action = new Action(Action.Type.EXIT, username, null, true);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException exception) {
             throw new DataAccessException(DataAccessException.Code.ServerError, exception.getMessage());

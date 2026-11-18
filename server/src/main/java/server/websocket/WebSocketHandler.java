@@ -29,7 +29,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             Action action = new Gson().fromJson(wsMessageContext.message(), Action.class);
             switch (action.type()) {
-                case ENTER -> enter(action.visitorName(), wsMessageContext.session);
+                case ENTER -> enter(action.visitorName(), wsMessageContext.session, action.color(), action.isPlayer());
                 case EXIT -> exit(action.visitorName(), wsMessageContext.session);
                 //add move, resign
             }
@@ -38,15 +38,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void enter(String visitorName, Session session) throws IOException {
+    private void enter(String visitorName, Session session, String color, boolean isPlayer) throws IOException {
         connections.add(session);
-        var message = String.format("%s is in the shop", visitorName);
-        var notification = new Notification(Notification.Type.ARRIVAL, message);
-        connections.broadcast(session, notification);
+        if (isPlayer) {
+            var message = String.format("%s joined the game", visitorName);
+            var notification = new Notification(Notification.Type.ARRIVAL, message);
+            connections.broadcast(session, notification);
+        } else {
+            var message = String.format("%s joined the game", visitorName);
+            var notification = new Notification(Notification.Type.ARRIVAL, message);
+            connections.broadcast(session, notification);
+        }
     }
 
     private void exit(String visitorName, Session session) throws IOException {
-        var message = String.format("%s left the shop", visitorName);
+        var message = String.format("%s left the game", visitorName);
         var notification = new Notification(Notification.Type.DEPARTURE, message);
         connections.broadcast(session, notification);
         connections.remove(session);
