@@ -4,6 +4,8 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import client.websocket.NotificationHandler;
+import client.websocket.WebSocketFacade;
 import model.GameData;
 import model.LoginResult;
 import model.LoginRequest;
@@ -19,6 +21,7 @@ import model.JoinGameResult;
 import model.RegisterRequest;
 import model.RegisterResult;
 import ui.EscapeSequences;
+import websocket.Notification;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,12 +30,14 @@ import java.util.Scanner;
 
 import static java.lang.Integer.parseInt;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler {
     private static String authToken = null;
     private static ServerFacade facade;
+    private static WebSocketFacade ws = null;
 
     public ChessClient(String serverURL) {
         facade = new ServerFacade(serverURL);
+        ws = new WebSocketFacade(serverURL, this);
     }
 
     public void run() {
@@ -41,8 +46,6 @@ public class ChessClient {
         String prefix = "[LOGGED OUT] >>> ";
         Scanner scanner = new Scanner(System.in);
         System.out.print("Type help to get started!\n");
-//        printBoard(new ChessGame(), "WHITE");
-//        printBoard(new ChessGame(), "BLACK");
         while (true) {
             if (!loggedIn) {
                 preUI(prefix, loggedIn, scanner);
@@ -276,7 +279,7 @@ public class ChessClient {
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
             System.out.print("Joined game: initiating gameplay"+"\n");
             ChessGame game = getGame(id);
-            gameplay(color, game, true, scanner);
+            //gameplay(color, game, true, scanner, username);
 //            assert game != null;
 //            printBoard(game, color);
         } catch (DataAccessException exception) {
@@ -284,38 +287,41 @@ public class ChessClient {
         }
     }
 
-    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner) {
+    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner, String username) {
         //help - display options
         //redraw chess board - redraws chessboard
         //leave - return to post UI
         // Make Move - make a move
         // Resign - Doesn't leave but ends game
         // Highlight legal Moves - input piece for which they want to highlight legal moves, the selected pieces's current square and all squares it can legally move are highlighted.
-        boolean resigned = false;
+        //ws.joinGame();
+        boolean gameOver = false;
         boolean wantsToLeave = false;
+
         while (!wantsToLeave) {
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
             String input = scanner.nextLine();
-            if (input.equals("help")) {
-                helpGameplay();
-            } else if (input.equals("redraw chess board")) {
-                printBoard(game, color);
-            } else if (input.equals("leave")) {
-                wantsToLeave = true;
-                System.out.print("You have left the game. Returning to menu\n");
-            } else if (input.equals("make move")) {
-                System.out.print("Move format <row piece><col piece> <row target><col target> Ex: e2 e4\n");
-                String makeMoveInput = scanner.nextLine();
-                if (makeMoveCheck(makeMoveInput)) {
-                    System.out.print("will make move " + makeMoveInput + "\n");
+            switch (input) {
+                case "help" -> helpGameplay();
+                case "redraw chess board" -> printBoard(game, color);
+                case "leave" -> {
+                    wantsToLeave = true;
+                    System.out.print("You have left the game. Returning to menu\n");
                 }
-            } else if (input.equals("resign")) {
-                resigned = true;
-                System.out.print(color + " resigned. Game Over\n");
-            } else if (input.equals("highlight legal moves")) {
-
-            } else {
-                System.out.print("Incorrect input, type help for option\n");
+                case "make move" -> {
+                    System.out.print("Move format <row piece><col piece> <row target><col target> Ex: e2 e4\n");
+                    String makeMoveInput = scanner.nextLine();
+                    if (makeMoveCheck(makeMoveInput)) {
+                        System.out.print("will make move " + makeMoveInput + "\n");
+                    }
+                }
+                case "resign" -> {
+                    gameOver = true;
+                    System.out.print(color + " resigned. Game Over\n");
+                }
+                case "highlight legal moves" -> {
+                }
+                default -> System.out.print("Incorrect input, type help for option\n");
             }
         }
     }
@@ -485,7 +491,7 @@ public class ChessClient {
         }
         boolean isNum;
         try {
-            Integer.parseInt(info[0]);
+            parseInt(info[0]);
             isNum = true;
         } catch (NumberFormatException exception) {
             isNum = false;
@@ -511,10 +517,15 @@ public class ChessClient {
             return false;
         }
         try {
-            Integer.parseInt(info[0]);
+            parseInt(info[0]);
             return true;
         } catch (NumberFormatException exception) {
             return false;
         }
+    }
+
+
+    public void notify(Notification notification) {
+        System.out.println(notification.message());
     }
 }

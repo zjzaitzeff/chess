@@ -5,7 +5,9 @@ import com.google.gson.Gson;
 public record Action(Type type, String visitorName) {
     public enum Type {
         ENTER,
-        EXIT
+        EXIT,
+        RESIGN,
+        MAKE_MOVE
     }
 
     public String toString() {

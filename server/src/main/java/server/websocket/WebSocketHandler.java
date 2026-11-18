@@ -31,6 +31,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (action.type()) {
                 case ENTER -> enter(action.visitorName(), wsMessageContext.session);
                 case EXIT -> exit(action.visitorName(), wsMessageContext.session);
+                //add move, resign
             }
         } catch (IOException ex) {
             ex.printStackTrace();
