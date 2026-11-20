@@ -1,6 +1,8 @@
 package server.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -15,11 +17,14 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
     private final ConnectionManager connections = new ConnectionManager();
+    private final Collection<Integer> completedGames = new ArrayList<>();
 
     public WebSocketHandler(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
@@ -123,8 +128,100 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void makeMove(String authToken, Session session, int gameID, ChessMove chessMove) {
-        //should mark game as complete if move puts into checkmate
+    private void makeMove(String authToken, Session session, int gameID, ChessMove chessMove) throws DataAccessException, IOException {
+        //verify validity of move
+        try {
+            if (completedGames.contains(gameID)) {
+                sendErrorNotification(session, "Game complete, can not make more moves\n");
+            } else {
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData == null) {
+                sendErrorNotification(session, "gameID incorrect\n");
+            } else if (authToken == null || authDAO.getAuth(authToken) == null) {
+                sendErrorNotification(session, "authToken incorrect\n");
+            } else if (checkIfMoveValid(authToken, gameData, chessMove)) {
+                sendErrorNotification(session, "Chess Move Incorrect. Either not your turn, not your piece, or invalid move\n");
+            } else {
+                //update game
+                ChessGame game = gameData.chess();
+                try {
+                    game.makeMove(chessMove);
+                    //send LOAD_GAME to all clients
+                    connections.broadcastLoadGameAllPlayers(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
+                    //send Notification to all OTHER clients informing them what move was made
+                    String message = String.format("%s (%s) moved to %s", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMove.toString());
+                    connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
+                    //if move results in check, checkmate, stalemate, Send Notification to all clients
+                    checks(authToken, gameID);
+                } catch (InvalidMoveException | IOException exception) {
+                    sendErrorNotification(session, "Invalid move\n");
+                }
+            }
+        }
+        } catch (DataAccessException exception) {
+            throw new DataAccessException("database error");
+        }
+    }
 
+    private void checks(String authToken, int gameID) throws DataAccessException, IOException {
+        ChessGame game = gameDAO.getGame(gameID).chess();
+        String color = getColor(authToken, gameID);
+        ChessGame.TeamColor playerColor = returnTeamColor(color);
+        if (playerColor != null) {
+            if (game.isInCheck(playerColor)) {
+                String message = String.format("%s is in check\n", convertToStringFromTeamObject(game.getTeamTurn()));
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
+            } else if (game.isInStalemate(playerColor)) {
+                String message = String.format("%s is in stalemate\n", convertToStringFromTeamObject(game.getTeamTurn()));
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
+                completedGames.add(gameID);
+            } else if (game.isInCheckmate(playerColor)) {
+                String message = String.format("%s is in check", convertToStringFromTeamObject(game.getTeamTurn()));
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
+                completedGames.add(gameID);
+            }
+        }
+    }
+
+    private String convertToStringFromTeamObject(ChessGame.TeamColor color) {
+        if (color.equals(ChessGame.TeamColor.WHITE)) {
+            return "WHITE";
+        } else if (color.equals(ChessGame.TeamColor.BLACK)) {
+            return "BLACK";
+        }
+        return null;
+    }
+
+    private boolean checkIfMoveValid(String authToken, GameData gameData, ChessMove move) throws DataAccessException {
+        //wrong color
+        String color = getColor(authToken, gameData.gameID());
+        ChessGame.TeamColor playerColor = returnTeamColor(color);
+        if (playerColor == null) {
+            return false;
+        }
+        ChessGame.TeamColor turnColor = gameData.chess().getTeamTurn();
+        if (!turnColor.equals(playerColor)) {
+            return false;
+        }
+        //not able to move to that location
+        Collection<ChessMove> validMoves = gameData.chess().validMoves(move.getStartPosition());
+        return validMoves.contains(move);
+    }
+
+    private ChessGame.TeamColor returnTeamColor(String color) {
+        if (color.equals("WHITE")) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (color.equals("BLACK")) {
+            return ChessGame.TeamColor.BLACK;
+        } else {
+            return null;
+        }
+    }
+
+    private void sendErrorNotification(Session session, String message) throws IOException {
+        if (session.isOpen()) {
+            NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Error: " + message);
+            session.getRemote().sendString(new Gson().toJson(notificationMessage));
+        }
     }
 }

@@ -322,7 +322,7 @@ public class ChessClient implements NotificationHandler {
                         if (makeMoveCheck(makeMoveInfo)) {
                             System.out.print("will make move " + makeMoveInput + "\n");
                             ChessMove chessMove = convertStringToChessMove(makeMoveInfo);
-
+                            ws.makeMove(authToken, gameID, chessMove);
                         } else {
                             System.out.print("Incorrect format, please retry\n");
                         }
