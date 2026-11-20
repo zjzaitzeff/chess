@@ -166,14 +166,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 ChessGame game = gameData.chess();
                 try {
                     game.makeMove(chessMove);
+                    gameDAO.updateGame(gameData.gameID(), new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
                     //send LOAD_GAME to all clients
                     connections.broadcastLoadGameAllPlayers(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
                     //send Notification to all OTHER clients informing them what move was made
-                    String message = String.format("%s (%s) moved: \n", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMoveString(chessMove));
+                    String message = String.format("%s (%s) moved: %s\n", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMoveString(chessMove));
                     connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                     //if move results in check, checkmate, stalemate, Send Notification to all clients
                     checks(authToken, gameID);
-                    gameDAO.updateGame(gameData.gameID(), new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
                 } catch (InvalidMoveException | IOException exception) {
                     sendErrorNotification(session, "Invalid move\n");
                 }
@@ -215,11 +215,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } else if (c==6) {
             cString = "f";
         } else if (c==7) {
-            cString ="h";
-        } else {
+            cString ="g";
+        } else if (c==8) {
+            cString = "h";
+        } else {;
             cString="something went horribly wrong";
         }
-        return String.format("%s%s\n", cString, r);
+        return String.format("%s%s", cString, r);
     }
 
     private String generatePromotionPieceString(ChessPiece.PieceType type) {
