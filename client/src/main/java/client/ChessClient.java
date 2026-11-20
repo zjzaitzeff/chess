@@ -307,7 +307,7 @@ public class ChessClient implements NotificationHandler {
             String input = scanner.nextLine();
             switch (input) {
                 case "help" -> helpGameplay();
-                case "redraw" -> printBoard(game, color);
+                case "redraw" -> printBoard(game, color, null);
                 case "leave" -> {
                     wantsToLeave = true;
                     System.out.print("You have left the game. Returning to menu\n");
@@ -317,7 +317,7 @@ public class ChessClient implements NotificationHandler {
                 }
                 case "make move" -> {
                     if (!gameOver) {
-                        System.out.print("Move format <row piece><col piece> <row target><col target> <promotion>\nEx: e2 e4 pawn\nif you don't want to promote type none\n");
+                        System.out.print("Move format <col piece><row piece> <col target><row target> <promotion>\nEx: e2 e4 pawn\nif you don't want to promote type none\n");
                         String makeMoveInput = scanner.nextLine();
                         String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
                         if (makeMoveCheck(makeMoveInfo)) {
@@ -335,11 +335,38 @@ public class ChessClient implements NotificationHandler {
                     ws.resign(authToken, gameID);
                 }
                 case "highlight" -> {
+                    System.out.print("Highlight format <col><row>\nEX: e2 \n");
+                    String highlightInput = scanner.nextLine();
+                    String[] highlightInfo = highlightInput.trim().split("\\s+");
+                    if (highlightCheck(highlightInfo)) {
+                        ChessPosition chessPosition = createChessPosition(highlightInput);
+                        printBoard(game, color, chessPosition);
+                    }
                 }
                 default -> System.out.print("Incorrect input, type help for option\n");
             }
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
         }
+    }
+
+    private static boolean highlightCheck(String[] info) {
+        Collection<String> approvedLetters = List.of("a", "b", "c", "d", "e", "f", "g", "h");
+        Collection<String> approvedNumbers = List.of("1", "2", "3", "4", "5", "6", "7", "8");
+        if (info.length != 1) {
+            return false;
+        }
+        String position = info[0];
+        if (position.length() != 2) {
+            return false;
+        }
+        if (!approvedLetters.contains(String.valueOf(position.charAt(0)))) {
+            return false;
+        }
+        if (!approvedNumbers.contains(String.valueOf(position.charAt(1)))) {
+            return false;
+        }
+        return true;
+
     }
 
     private static ChessMove convertStringToChessMove(String[] input) {
@@ -438,16 +465,17 @@ public class ChessClient implements NotificationHandler {
         return null;
     }
 
-    private static void printBoard(ChessGame game, String color) {
+    private static void printBoard(ChessGame game, String color, ChessPosition chessPosition) {
         ChessBoard board = game.getBoard();
+        Collection<ChessMove> validMoves = game.validMoves(chessPosition);
         if (color.equals("WHITE")) {
             System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + "  A  B  C  D  E  F  G  H  \n");
             for (int i = 8; i > 0; i--) {
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i);
                 if (i % 2 == 0) {
-                    printWhiteRowWhite(board, i);
+                    printWhiteRowWhite(board, i, validMoves);
                 } else {
-                    printBlackRowWhite(board, i);
+                    printBlackRowWhite(board, i,  validMoves);
                 }
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i + "\n");
             }
@@ -457,9 +485,9 @@ public class ChessClient implements NotificationHandler {
             for (int i = 1; i < 9; i++) {
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i);
                 if (i % 2 == 0) {
-                    printBlackRowBlack(board, i);
+                    printBlackRowBlack(board, i, validMoves);
                 } else {
-                    printWhiteRowBlack(board, i);
+                    printWhiteRowBlack(board, i, validMoves);
                 }
                 System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i + "\n");
             }
@@ -467,44 +495,71 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
-    private static void printWhiteRowWhite(ChessBoard board, int r) {
+    private static void printWhiteRowWhite(ChessBoard board, int r, Collection<ChessMove> validMoves) {
         for (int j = 1; j < 9; j++) {
-            whiteRowHelper(board,r,j);
+            whiteRowHelper(board,r,j, validMoves);
         }
     }
 
-    private static void printBlackRowWhite(ChessBoard board, int r) {
+    private static void printBlackRowWhite(ChessBoard board, int r, Collection<ChessMove> validMoves) {
         for (int j = 1; j < 9; j++) {
-            blackRowHelper(board, r, j);
+            blackRowHelper(board, r, j, validMoves);
         }
     }
 
-    private static void printWhiteRowBlack(ChessBoard board, int r) {
+    private static void printWhiteRowBlack(ChessBoard board, int r, Collection<ChessMove> validMoves) {
         for (int j = 8; j > 0; j --) {
-            whiteRowHelper(board,r,j);
+            whiteRowHelper(board,r,j,validMoves);
         }
     }
 
-    private static void printBlackRowBlack(ChessBoard board, int r) {
+    private static void printBlackRowBlack(ChessBoard board, int r, Collection<ChessMove> validMoves) {
         for (int j = 8; j > 0; j --) {
-            blackRowHelper(board, r, j);
+            blackRowHelper(board, r, j, validMoves);
         }
     }
 
-    private static void blackRowHelper(ChessBoard board, int r, int j) {
+    private static void blackRowHelper(ChessBoard board, int r, int j, Collection<ChessMove> validMoves) {
+        ChessPosition chessPosition = new ChessPosition(r, j);
         if (j % 2 == 0) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
+            if (validMoves != null && checkIfInValidMoves(validMoves, chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_GREEN + getPieceStr(board, r, j));
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
+            }
         } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
+            if (validMoves != null && checkIfInValidMoves(validMoves, chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN + getPieceStr(board, r, j));
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
+            }
         }
     }
 
-    private static void whiteRowHelper(ChessBoard board, int r, int j) {
+    private static void whiteRowHelper(ChessBoard board, int r, int j, Collection<ChessMove> validMoves) {
+        ChessPosition chessPosition = new ChessPosition(r, j);
         if (j % 2 == 0) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
+            if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN + getPieceStr(board, r, j));
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
+            }
         } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
+            if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_GREEN + getPieceStr(board, r, j));
+            } else {
+                System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
+            }
         }
+    }
+
+    private static boolean checkIfInValidMoves(Collection<ChessMove> validMoves, ChessPosition chessPosition) {
+        for (ChessMove move : validMoves) {
+            if (chessPosition.equals(move.getEndPosition())) {
+                return true;
+            }
+        }
+        return false;
     }
     private static String getPieceStr(ChessBoard board, int r, int c) {
         ChessPiece p = board.getPiece(new ChessPosition(r,c));
@@ -603,7 +658,7 @@ public class ChessClient implements NotificationHandler {
     public void notify(ServerMessage serverMessage) {
         if (serverMessage instanceof LoadGameMessage loadGameMessage) {
             currGame = loadGameMessage.returnGame();
-            printBoard(currGame, currColor);
+            printBoard(currGame, currColor, null);
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
         } else if (serverMessage instanceof NotificationMessage notificationMessage) {
             String message = notificationMessage.getMessage();
