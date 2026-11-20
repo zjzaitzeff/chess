@@ -63,7 +63,7 @@ public class ChessClient implements NotificationHandler {
     private static void quit(Scanner scanner) {
         System.out.print("Quiting Game");
         scanner.close();
-        clearDataBase();
+//        clearDataBase();
         System.exit(0);
     }
 

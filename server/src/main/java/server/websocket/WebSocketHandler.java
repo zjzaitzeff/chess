@@ -128,7 +128,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             if (checkAuthTokenAndGameIDCorrect(authToken, gameID, session)) {
                 String username = authDAO.getAuth(authToken).username();
-                var message = String.format("%s left the game", username);
+                var message = String.format("%s left the game\n", username);
                 connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                 connections.remove(session);
                 GameData game = gameDAO.getGame(gameID);
@@ -169,7 +169,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     //send LOAD_GAME to all clients
                     connections.broadcastLoadGameAllPlayers(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
                     //send Notification to all OTHER clients informing them what move was made
-                    String message = String.format("%s (%s) moved: ", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMoveString(chessMove));
+                    String message = String.format("%s (%s) moved: \n", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMoveString(chessMove));
                     connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                     //if move results in check, checkmate, stalemate, Send Notification to all clients
                     checks(authToken, gameID);
@@ -180,7 +180,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
         }
         } catch (DataAccessException exception) {
-            throw new DataAccessException("database error");
+            throw new DataAccessException("database error\n");
         }
     }
 
@@ -219,7 +219,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } else {
             cString="something went horribly wrong";
         }
-        return String.format("%s%s", cString, r);
+        return String.format("%s%s\n", cString, r);
     }
 
     private String generatePromotionPieceString(ChessPiece.PieceType type) {
@@ -248,7 +248,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                 completedGames.add(gameID);
             } else if (game.isInCheckmate(playerColor)) {
-                String message = String.format("%s is in checkmate", convertToStringFromTeamObject(game.getTeamTurn()));
+                String message = String.format("%s is in checkmate\n", convertToStringFromTeamObject(game.getTeamTurn()));
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                 completedGames.add(gameID);
             }
