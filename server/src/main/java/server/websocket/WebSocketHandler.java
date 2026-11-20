@@ -1,8 +1,6 @@
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -171,7 +169,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     //send LOAD_GAME to all clients
                     connections.broadcastLoadGameAllPlayers(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game));
                     //send Notification to all OTHER clients informing them what move was made
-                    String message = String.format("%s (%s) moved to %s", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMove.toString());
+                    String message = String.format("%s (%s) moved: ", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMoveString(chessMove));
                     connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                     //if move results in check, checkmate, stalemate, Send Notification to all clients
                     checks(authToken, gameID);
@@ -183,6 +181,56 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         } catch (DataAccessException exception) {
             throw new DataAccessException("database error");
+        }
+    }
+
+    private String chessMoveString(ChessMove chessMove) {
+        ChessPosition startPosition = chessMove.getStartPosition();
+        ChessPosition endPosition = chessMove.getEndPosition();
+        String startPositionString = generatePosString(startPosition);
+        String endPositionString = generatePosString(endPosition);
+        String promotionString;
+        if (chessMove.getPromotionPiece() != null) {
+            promotionString = generatePromotionPieceString(chessMove.getPromotionPiece());
+        } else {
+            promotionString = "";
+        }
+        return String.format("%s to %s %s", startPositionString, endPositionString, promotionString);
+    }
+
+    private String generatePosString(ChessPosition chessPosition) {
+        int r = chessPosition.getRow();
+        int c = chessPosition.getColumn();
+        String cString;
+        if (c == 1) {
+            cString = "a";
+        } else if (c == 2) {
+            cString = "b";
+        } else if (c == 3) {
+            cString = "c";
+        } else if (c==4) {
+            cString = "d";
+        } else if (c==5) {
+            cString = "e";
+        } else if (c==6) {
+            cString = "f";
+        } else if (c==7) {
+            cString ="h";
+        } else {
+            cString="something went horribly wrong";
+        }
+        return String.format("%s%s", cString, r);
+    }
+
+    private String generatePromotionPieceString(ChessPiece.PieceType type) {
+        if (type.equals(ChessPiece.PieceType.QUEEN)) {
+            return "promotion: queen";
+        } else if (type.equals(ChessPiece.PieceType.ROOK)) {
+            return "promotion: rook";
+        } else if (type.equals(ChessPiece.PieceType.KNIGHT)) {
+            return "promotion: knight";
+        } else {
+            return "promotion: bishop";
         }
     }
 
