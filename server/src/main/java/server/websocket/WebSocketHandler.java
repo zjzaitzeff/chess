@@ -64,6 +64,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             String username = authDAO.getAuth(authToken).username();
             var message = String.format("%s resigned. Game over\n", username);
             connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,message));
+            completedGames.add(gameID);
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         } catch (Exception exception) {
@@ -139,7 +140,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 sendErrorNotification(session, "gameID incorrect\n");
             } else if (authToken == null || authDAO.getAuth(authToken) == null) {
                 sendErrorNotification(session, "authToken incorrect\n");
-            } else if (checkIfMoveValid(authToken, gameData, chessMove)) {
+            } else if (!checkIfMoveValid(authToken, gameData, chessMove)) {
                 sendErrorNotification(session, "Chess Move Incorrect. Either not your turn, not your piece, or invalid move\n");
             } else {
                 //update game
@@ -153,6 +154,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                     //if move results in check, checkmate, stalemate, Send Notification to all clients
                     checks(authToken, gameID);
+                    gameDAO.updateGame(gameData.gameID(), new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
                 } catch (InvalidMoveException | IOException exception) {
                     sendErrorNotification(session, "Invalid move\n");
                 }
@@ -166,7 +168,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void checks(String authToken, int gameID) throws DataAccessException, IOException {
         ChessGame game = gameDAO.getGame(gameID).chess();
         String color = getColor(authToken, gameID);
-        ChessGame.TeamColor playerColor = returnTeamColor(color);
+        String oppColor = getOppositeColor(color);
+        ChessGame.TeamColor playerColor = returnTeamColor(oppColor);
         if (playerColor != null) {
             if (game.isInCheck(playerColor)) {
                 String message = String.format("%s is in check\n", convertToStringFromTeamObject(game.getTeamTurn()));
@@ -176,10 +179,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                 completedGames.add(gameID);
             } else if (game.isInCheckmate(playerColor)) {
-                String message = String.format("%s is in check", convertToStringFromTeamObject(game.getTeamTurn()));
+                String message = String.format("%s is in checkmate", convertToStringFromTeamObject(game.getTeamTurn()));
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                 completedGames.add(gameID);
             }
+        }
+    }
+
+    private String getOppositeColor(String color) {
+        if (color.equals("WHITE")) {
+            return "BLACK";
+        } else {
+            return "WHITE";
         }
     }
 
@@ -205,6 +216,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         //not able to move to that location
         Collection<ChessMove> validMoves = gameData.chess().validMoves(move.getStartPosition());
+        if (validMoves == null) {
+            return false;
+        }
         return validMoves.contains(move);
     }
 

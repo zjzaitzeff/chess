@@ -92,13 +92,13 @@ public class ChessClient implements NotificationHandler {
                         String username = registerInfo[0];
                         String password = registerInfo[1];
                         String email = registerInfo[2];
-                        register(username, password, email);
+                        if (register(username, password, email)) {
                         if (login(username, password)) {
                             System.out.print("Logged in as: " + username + "\n");
                             loggedIn = true;
                         } else {
                             System.out.print("Registered but failed to login\n");
-                        }
+                        }}
                     } else {
                         System.out.print("Incorrect input: <username> <password> <email>\nIf you want to register please type register\n");
                     }
@@ -144,14 +144,16 @@ public class ChessClient implements NotificationHandler {
         return info.length == 2;
     }
 
-    public static void register(String username, String password, String email) {
+    public static boolean register(String username, String password, String email) {
         try {
             RegisterRequest registerRequest = new RegisterRequest(username, password, email);
             RegisterResult registerResult = facade.register(registerRequest);
             authToken = registerResult.authToken();
             System.out.print("Registered: " + registerResult.username() + "\n");
+            return true;
         } catch (DataAccessException exception) {
             System.out.print("Registration failed, try again\n");
+            return false;
         }
     }
 
@@ -271,7 +273,7 @@ public class ChessClient implements NotificationHandler {
             } else {
                 blackUser = game.blackUsername();
             }
-            System.out.print("GameID: " + game.gameID() + EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName() + EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser + EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser +"\n");
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "GameID: " + game.gameID() + EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName() + EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser + EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser +"\n");
         }
     }
 
@@ -282,7 +284,7 @@ public class ChessClient implements NotificationHandler {
 //            System.out.print("Joined game: initiating gameplay"+"\n");
             ChessGame game = getGame(id);
             currColor = color;
-            gameplay(color, game, true, scanner, id);
+            gameplay(color, game, scanner, id);
 //            assert game != null;
 //            printBoard(game, color);
         } catch (DataAccessException exception) {
@@ -290,7 +292,7 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
-    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner, int gameID) {
+    private static void gameplay(String color, ChessGame game, Scanner scanner, int gameID) {
         //help - display options
         //redraw chess board - redraws chessboard
         //leave - return to post UI
@@ -315,11 +317,10 @@ public class ChessClient implements NotificationHandler {
                 }
                 case "make move" -> {
                     if (!gameOver) {
-                        System.out.print("Move format <row piece><col piece> <row target><col target> <promotion>\nEx: e2 e4 pawn\n");
+                        System.out.print("Move format <row piece><col piece> <row target><col target> <promotion>\nEx: e2 e4 pawn\nif you don't want to promote type none\n");
                         String makeMoveInput = scanner.nextLine();
                         String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
                         if (makeMoveCheck(makeMoveInfo)) {
-                            System.out.print("will make move " + makeMoveInput + "\n");
                             ChessMove chessMove = convertStringToChessMove(makeMoveInfo);
                             ws.makeMove(authToken, gameID, chessMove);
                         } else {
@@ -344,7 +345,7 @@ public class ChessClient implements NotificationHandler {
     private static ChessMove convertStringToChessMove(String[] input) {
         String pos1 = input[0];
         String pos2 = input[1];
-        String promotion = input[3];
+        String promotion = input[2];
         ChessPosition chessPosition1 = createChessPosition(pos1);
         ChessPosition chessPosition2 = createChessPosition(pos2);
         ChessPiece.PieceType promotionType = generatePromotionType(promotion);
@@ -365,7 +366,7 @@ public class ChessClient implements NotificationHandler {
             case "h" -> 8;
             default -> 0;
         };
-        return new ChessPosition(row,col);
+        return new ChessPosition(col,row);
     }
 
     private static ChessPiece.PieceType generatePromotionType(String promotion) {
@@ -373,14 +374,15 @@ public class ChessClient implements NotificationHandler {
             case "knight" -> ChessPiece.PieceType.KNIGHT;
             case "bishop" -> ChessPiece.PieceType.BISHOP;
             case "queen" -> ChessPiece.PieceType.QUEEN;
-            default -> ChessPiece.PieceType.ROOK;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            default -> null;
         };
     }
 
     private static boolean makeMoveCheck(String[] input) {
         Collection<String> approvedLetters = List.of("a", "b", "c", "d", "e", "f", "g", "h");
         Collection<String> approvedNumbers = List.of("1", "2", "3", "4", "5", "6", "7", "8");
-        Collection<String> approvedPromotions = List.of("knight","bishop","queen","rook");
+        Collection<String> approvedPromotions = List.of("knight","bishop","queen","rook", "none");
         if (input.length != 3) {
             return false;
         }
@@ -568,6 +570,7 @@ public class ChessClient implements NotificationHandler {
 
         }
         else {
+            currColor = "WHITE";
             ws.joinGame(authToken, id);
             boolean wantsToLeave = false;
             System.out.print("Observing game: " + id +"\n");
@@ -578,6 +581,7 @@ public class ChessClient implements NotificationHandler {
                     System.out.print("leaving game\n");
                     wantsToLeave = true;
                     ws.leaveGame(authToken, id);
+                    currColor = null;
                 }
             }
         }
