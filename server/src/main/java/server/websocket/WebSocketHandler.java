@@ -220,7 +220,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void sendErrorNotification(Session session, String message) throws IOException {
         if (session.isOpen()) {
-            NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Error: " + message);
+            NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             session.getRemote().sendString(new Gson().toJson(notificationMessage));
         }
     }

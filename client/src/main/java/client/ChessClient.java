@@ -33,7 +33,7 @@ public class ChessClient implements NotificationHandler {
     private static String authToken = null;
     private static ServerFacade facade;
     private static WebSocketFacade ws = null;
-    private static String currUsername = null;
+
     private static ChessGame currGame = null;
     private static String currColor = null;
 
@@ -134,7 +134,6 @@ public class ChessClient implements NotificationHandler {
             LoginRequest loginRequest = new LoginRequest(username, password);
             LoginResult loginResult = facade.login(loginRequest);
             authToken = loginResult.authToken();
-            currUsername = username;
             return true;
         } catch (DataAccessException exception) {
             return false;
@@ -203,7 +202,7 @@ public class ChessClient implements NotificationHandler {
                     if (observeCheck(observeInfo)) {
                         String strId = observeInfo[0];
                         int id = parseInt(strId);
-                        observe(id);
+                        observe(id, scanner);
                     } else {
                         System.out.print("Observe format incorrect: <ID>\n");
                     }
@@ -562,14 +561,25 @@ public class ChessClient implements NotificationHandler {
         return info[1].equals("WHITE") || info[1].equals("BLACK");
     }
 
-    private static void observe(int id) {
+    private static void observe(int id, Scanner scanner) {
         ChessGame game = getGame(id);
         if (game == null) {
             System.out.print("Game ID incorrect, create another game or use list to see available games\n");
 
         }
         else {
-            printBoard(game, "WHITE");
+            ws.joinGame(authToken, id);
+            boolean wantsToLeave = false;
+            System.out.print("Observing game: " + id +"\n");
+            while (!wantsToLeave) {
+                System.out.print("type leave to stop observing, type help to see this message again\n");
+                String input = scanner.nextLine();
+                if (input.equals("leave")) {
+                    System.out.print("leaving game\n");
+                    wantsToLeave = true;
+                    ws.leaveGame(authToken, id);
+                }
+            }
         }
     }
 
