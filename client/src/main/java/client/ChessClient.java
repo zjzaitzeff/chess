@@ -299,7 +299,7 @@ public class ChessClient implements NotificationHandler {
         // Make Move - make a move
         // Resign - Doesn't leave but ends game
         // Highlight legal Moves - input piece for which they want to highlight legal moves, the selected pieces's current square and all squares it can legally move are highlighted.
-        boolean gameOver = false;
+        boolean gameOver = determineIfGameComplete(game);
         boolean wantsToLeave = false;
         ws.joinGame(authToken, gameID);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
@@ -346,6 +346,20 @@ public class ChessClient implements NotificationHandler {
                 default -> System.out.print("Incorrect input, type help for option\n");
             }
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
+        }
+    }
+
+    private static boolean determineIfGameComplete(ChessGame game) {
+        if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            return true;
+        } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+            return true;
+        } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            return true;
+        } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            return true;
+        } else {
+            return false;
         }
     }
 
