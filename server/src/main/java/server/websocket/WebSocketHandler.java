@@ -1,17 +1,33 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.Action;
 import websocket.Notification;
+import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
-
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
     private final ConnectionManager connections = new ConnectionManager();
+
+    public WebSocketHandler(GameDAO gameDAO, AuthDAO authDAO) {
+        this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
+    }
 
     @Override
     public void handleClose(@NotNull WsCloseContext wsCloseContext) throws Exception {
@@ -27,34 +43,85 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleMessage(@NotNull WsMessageContext wsMessageContext) throws Exception {
         try {
-            Action action = new Gson().fromJson(wsMessageContext.message(), Action.class);
-            switch (action.type()) {
-                case ENTER -> enter(action.visitorName(), wsMessageContext.session, action.color(), action.isPlayer());
-                case EXIT -> exit(action.visitorName(), wsMessageContext.session);
+            UserGameCommand action = new Gson().fromJson(wsMessageContext.message(), UserGameCommand.class);
+            switch (action.getCommandType()) {
+                case UserGameCommand.CommandType.CONNECT -> enter(action.getAuthToken(), wsMessageContext.session, action.getGameID());
+                case UserGameCommand.CommandType.RESIGN -> resign(action.getAuthToken(), wsMessageContext.session, action.getGameID());
+                case UserGameCommand.CommandType.LEAVE -> exit(action.getAuthToken(), wsMessageContext.session, action.getGameID());
                 //add move, resign
             }
         } catch (IOException ex) {
-            ex.printStackTrace();
+            throw new IOException("Websocket failed");
         }
     }
 
-    private void enter(String visitorName, Session session, String color, boolean isPlayer) throws IOException {
-        connections.add(session);
-        if (isPlayer) {
-            var message = String.format("%s joined the game", visitorName);
-            var notification = new Notification(Notification.Type.ARRIVAL, message);
-            connections.broadcast(session, notification);
-        } else {
-            var message = String.format("%s joined the game", visitorName);
-            var notification = new Notification(Notification.Type.ARRIVAL, message);
-            connections.broadcast(session, notification);
+    private void resign(String authToken, Session session, int gameID) throws IOException {
+        // still need to mark game as complete
+        try {
+            String username = authDAO.getAuth(authToken).username();
+            var message = String.format("%s resigned. Game over", username);
+            connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,message));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
     }
 
-    private void exit(String visitorName, Session session) throws IOException {
-        var message = String.format("%s left the game", visitorName);
-        var notification = new Notification(Notification.Type.DEPARTURE, message);
-        connections.broadcast(session, notification);
-        connections.remove(session);
+    private void enter(String authToken, Session session, int gameID) throws IOException {
+        try {
+            connections.add(session);
+            if (session.isOpen()) {
+                LoadGameMessage loadGameMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME ,gameDAO.getGame(gameID).chess());
+                session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+            }
+            String color = getColor(authToken, gameID);
+            var message = String.format("%s joined the game as %s\n", authDAO.getAuth(authToken).username(), color);
+            connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION , message));
+        } catch (IOException exception) {
+            throw new IOException("Websocket failed\n");
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getColor(String authToken, int gameID) throws DataAccessException {
+        try {
+            String username = authDAO.getAuth(authToken).username();
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData != null) {
+                if (username.equals(gameData.whiteUsername())) {
+                    return "WHITE";
+                } else if (username.equals(gameData.blackUsername())) {
+                    return "BLACK";
+                }
+            }
+            return "OBSERVER";
+        } catch (DataAccessException exception) {
+            throw new DataAccessException("Websocket failed");
+        }
+    }
+
+    private void exit(String authToken, Session session, int gameID) throws IOException {
+        try {
+            String username = authDAO.getAuth(authToken).username();
+            var message = String.format("%s left the game", username);
+            connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
+            connections.remove(session);
+            GameData game = gameDAO.getGame(gameID);
+            String color = getColor(authToken, gameID);
+            if (game != null) {
+                if (color.equals("WHITE")) {
+                    gameDAO.updateGame(gameID, new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.chess()));
+                } else if (color.equals("BLACK")) {
+                    gameDAO.updateGame(gameID, new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.chess()));
+                }
+            }
+        } catch (IOException exception) {
+            throw new IOException("Websocket failed");
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

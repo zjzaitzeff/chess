@@ -22,6 +22,10 @@ import model.RegisterRequest;
 import model.RegisterResult;
 import ui.EscapeSequences;
 import websocket.Notification;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +38,9 @@ public class ChessClient implements NotificationHandler {
     private static String authToken = null;
     private static ServerFacade facade;
     private static WebSocketFacade ws = null;
-    private static String currUsername= null;
+    private static String currUsername = null;
+    private static ChessGame currGame = null;
+    private static String currColor = null;
 
     public ChessClient(String serverURL) {
         facade = new ServerFacade(serverURL);
@@ -281,7 +287,8 @@ public class ChessClient implements NotificationHandler {
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
 //            System.out.print("Joined game: initiating gameplay"+"\n");
             ChessGame game = getGame(id);
-            gameplay(color, game, true, scanner);
+            currColor = color;
+            gameplay(color, game, true, scanner, id);
 //            assert game != null;
 //            printBoard(game, color);
         } catch (DataAccessException exception) {
@@ -289,7 +296,7 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
-    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner) {
+    private static void gameplay(String color, ChessGame game, boolean isPlayer, Scanner scanner, int gameID) {
         //help - display options
         //redraw chess board - redraws chessboard
         //leave - return to post UI
@@ -299,9 +306,9 @@ public class ChessClient implements NotificationHandler {
         //ws.joinGame();
         boolean gameOver = false;
         boolean wantsToLeave = false;
-        ws.joinGame(currUsername, color, isPlayer);
+        ws.joinGame(authToken, gameID);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
         while (!wantsToLeave) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
             String input = scanner.nextLine();
             switch (input) {
                 case "help" -> helpGameplay();
@@ -309,6 +316,9 @@ public class ChessClient implements NotificationHandler {
                 case "leave" -> {
                     wantsToLeave = true;
                     System.out.print("You have left the game. Returning to menu\n");
+                    ws.leaveGame(authToken, gameID);
+                    currGame = null;
+                    currColor = null;
                 }
                 case "make move" -> {
                     System.out.print("Move format <row piece><col piece> <row target><col target> Ex: e2 e4\n");
@@ -325,6 +335,7 @@ public class ChessClient implements NotificationHandler {
                 }
                 default -> System.out.print("Incorrect input, type help for option\n");
             }
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
         }
     }
 
@@ -508,6 +519,7 @@ public class ChessClient implements NotificationHandler {
         ChessGame game = getGame(id);
         if (game == null) {
             System.out.print("Game ID incorrect, create another game or use list to see available games\n");
+
         }
         else {
             printBoard(game, "WHITE");
@@ -529,5 +541,20 @@ public class ChessClient implements NotificationHandler {
 
     public void notify(Notification notification) {
         System.out.println(notification.message());
+    }
+
+    @Override
+    public void notify(ServerMessage serverMessage) {
+        if (serverMessage instanceof LoadGameMessage loadGameMessage) {
+            currGame = loadGameMessage.returnGame();
+            printBoard(currGame, currColor);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
+        } else if (serverMessage instanceof NotificationMessage notificationMessage) {
+            String message = notificationMessage.getMessage();
+            System.out.print("Notification: " + message);
+        } else if (serverMessage instanceof ErrorMessage errorMessage) {
+            String message = errorMessage.getMessage();
+            System.out.print("Error: " + message);
+        }
     }
 }

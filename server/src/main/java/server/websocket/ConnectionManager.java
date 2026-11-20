@@ -1,7 +1,9 @@
 package server.websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.Notification;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 
 import java.io.IOException;
@@ -18,8 +20,8 @@ public class ConnectionManager {
         connections.remove(session);
     }
 
-    public void broadcast(Session excludeSession, Notification notification) throws IOException {
-        String msg = notification.toString();
+    public void broadcast(Session excludeSession, NotificationMessage notificationMessage) throws IOException {
+        String msg = new Gson().toJson(notificationMessage);
         for (Session c : connections.values()) {
             if (c.isOpen()) {
                 if (!c.equals(excludeSession)) {

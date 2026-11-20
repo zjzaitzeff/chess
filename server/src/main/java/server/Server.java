@@ -24,7 +24,7 @@ public class Server {
         userService = new UserService(userDAO, authDAO);
         clearService = new ClearService(userDAO, authDAO, gameDAO);
         gameService = new GameService(gameDAO, authDAO);
-        webSocketHandler = new WebSocketHandler();
+        webSocketHandler = new WebSocketHandler(gameDAO, authDAO);
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         javalin.delete("/db", new ClearHandler(clearService));
         javalin.post("/user", new RegisterHandler(userService));
