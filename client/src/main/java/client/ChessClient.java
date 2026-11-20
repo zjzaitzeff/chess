@@ -529,16 +529,16 @@ public class ChessClient implements NotificationHandler {
         if (j % 2 == 0) {
             if (validMoves != null && checkIfInValidMoves(validMoves, chessPosition)) {
                 System.out.print(EscapeSequences.SET_BG_COLOR_GREEN + getPieceStr(board, r, j));
-            } else if (piecePosition.equals(chessPosition)) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW + getPieceStr(board, r, j));
+            } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
             } else {
                 System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
             }
         } else {
             if (validMoves != null && checkIfInValidMoves(validMoves, chessPosition)) {
                 System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN + getPieceStr(board, r, j));
-            } else if (piecePosition.equals(chessPosition)) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW + getPieceStr(board, r, j));
+            } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
             } else {
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
             }
@@ -550,16 +550,16 @@ public class ChessClient implements NotificationHandler {
         if (j % 2 == 0) {
             if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
                 System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN + getPieceStr(board, r, j));
-            } else if (piecePosition.equals(chessPosition)) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW + getPieceStr(board, r, j));
+            } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
             } else {
                 System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
             }
         } else {
             if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
                 System.out.print(EscapeSequences.SET_BG_COLOR_GREEN + getPieceStr(board, r, j));
-            } else if (piecePosition.equals(chessPosition)) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW + getPieceStr(board, r, j));
+            } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
+                System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
             } else {
                 System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
             }
