@@ -1,17 +1,14 @@
 package server.websocket;
 
-import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import io.javalin.websocket.*;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
-import websocket.Action;
-import websocket.Notification;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -48,8 +45,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case UserGameCommand.CommandType.CONNECT -> enter(action.getAuthToken(), wsMessageContext.session, action.getGameID());
                 case UserGameCommand.CommandType.RESIGN -> resign(action.getAuthToken(), wsMessageContext.session, action.getGameID());
                 case UserGameCommand.CommandType.LEAVE -> exit(action.getAuthToken(), wsMessageContext.session, action.getGameID());
-                //add move, resign
+                case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(action.getAuthToken(), wsMessageContext.session, action.getGameID(), action.getChessMove());
             }
+
         } catch (IOException ex) {
             throw new IOException("Websocket failed");
         }
@@ -59,7 +57,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         // still need to mark game as complete
         try {
             String username = authDAO.getAuth(authToken).username();
-            var message = String.format("%s resigned. Game over", username);
+            var message = String.format("%s resigned. Game over\n", username);
             connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,message));
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
@@ -123,5 +121,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void makeMove(String authToken, Session session, int gameID, ChessMove chessMove) {
+        //should mark game as complete if move puts into checkmate
+
     }
 }

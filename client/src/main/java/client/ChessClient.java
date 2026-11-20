@@ -1,9 +1,6 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
 import model.GameData;
@@ -21,13 +18,11 @@ import model.JoinGameResult;
 import model.RegisterRequest;
 import model.RegisterResult;
 import ui.EscapeSequences;
-import websocket.Notification;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
@@ -303,7 +298,6 @@ public class ChessClient implements NotificationHandler {
         // Make Move - make a move
         // Resign - Doesn't leave but ends game
         // Highlight legal Moves - input piece for which they want to highlight legal moves, the selected pieces's current square and all squares it can legally move are highlighted.
-        //ws.joinGame();
         boolean gameOver = false;
         boolean wantsToLeave = false;
         ws.joinGame(authToken, gameID);
@@ -321,15 +315,24 @@ public class ChessClient implements NotificationHandler {
                     currColor = null;
                 }
                 case "make move" -> {
-                    System.out.print("Move format <row piece><col piece> <row target><col target> Ex: e2 e4\n");
-                    String makeMoveInput = scanner.nextLine();
-                    if (makeMoveCheck(makeMoveInput)) {
-                        System.out.print("will make move " + makeMoveInput + "\n");
+                    if (!gameOver) {
+                        System.out.print("Move format <row piece><col piece> <row target><col target> <promotion>\nEx: e2 e4 pawn\n");
+                        String makeMoveInput = scanner.nextLine();
+                        String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
+                        if (makeMoveCheck(makeMoveInfo)) {
+                            System.out.print("will make move " + makeMoveInput + "\n");
+                            ChessMove chessMove = convertStringToChessMove(makeMoveInfo);
+
+                        } else {
+                            System.out.print("Incorrect format, please retry\n");
+                        }
+                    } else {
+                        System.out.print("game is over you can not make a move\n");
                     }
                 }
                 case "resign" -> {
                     gameOver = true;
-                    System.out.print(color + " resigned. Game Over\n");
+                    ws.resign(authToken, gameID);
                 }
                 case "highlight" -> {
                 }
@@ -339,30 +342,74 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
-    private static boolean makeMoveCheck(String input) {
+    private static ChessMove convertStringToChessMove(String[] input) {
+        String pos1 = input[0];
+        String pos2 = input[1];
+        String promotion = input[3];
+        ChessPosition chessPosition1 = createChessPosition(pos1);
+        ChessPosition chessPosition2 = createChessPosition(pos2);
+        ChessPiece.PieceType promotionType = generatePromotionType(promotion);
+        return new ChessMove(chessPosition1, chessPosition2, promotionType);
+    }
+
+    private static ChessPosition createChessPosition(String pos) {
+        int col = Integer.parseInt(String.valueOf(pos.charAt(1)));
+        String r = String.valueOf(pos.charAt(0));
+        int row = switch (r) {
+            case "a" -> 1;
+            case "b" -> 2;
+            case "c" -> 3;
+            case "d" -> 4;
+            case "e" -> 5;
+            case "f" -> 6;
+            case "g" -> 7;
+            case "h" -> 8;
+            default -> 0;
+        };
+        return new ChessPosition(row,col);
+    }
+
+    private static ChessPiece.PieceType generatePromotionType(String promotion) {
+        return switch (promotion) {
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            default -> ChessPiece.PieceType.ROOK;
+        };
+    }
+
+    private static boolean makeMoveCheck(String[] input) {
         Collection<String> approvedLetters = List.of("a", "b", "c", "d", "e", "f", "g", "h");
         Collection<String> approvedNumbers = List.of("1", "2", "3", "4", "5", "6", "7", "8");
-        if (input.length() != 5) {
+        Collection<String> approvedPromotions = List.of("knight","bishop","queen","rook");
+        if (input.length != 3) {
             return false;
         }
-        char thing1 = input.charAt(0);
-        char thing2 = input.charAt(1);
-        char thing3 = input.charAt(2);
-        char thing4 = input.charAt(3);
-        char thing5 = input.charAt(4);
-        if (!approvedLetters.contains(String.valueOf(thing1))) {
+        String pos1 = input[0];
+        String pos2 = input[1];
+        String promotion = input[2];
+        if (pos1.length() != 2) {
             return false;
         }
-        if (!approvedNumbers.contains(String.valueOf(thing2))) {
+        if (pos2.length() !=2) {
             return false;
         }
-        if (!String.valueOf(thing3).equals(" ")) {
+        if (!approvedLetters.contains(String.valueOf(pos1.charAt(0)))) {
             return false;
         }
-        if (!approvedLetters.contains(String.valueOf(thing4))) {
+        if (!approvedNumbers.contains(String.valueOf(pos1.charAt(1)))) {
             return false;
         }
-        return approvedNumbers.contains(String.valueOf(thing5));
+        if (!approvedLetters.contains(String.valueOf(pos2.charAt(0)))) {
+            return false;
+        }
+        if (!approvedNumbers.contains(String.valueOf(pos2.charAt(1)))) {
+            return false;
+        }
+        if (!approvedPromotions.contains(promotion)) {
+            return false;
+        }
+        return true;
     }
 
     private static void helpGameplay() {
@@ -536,11 +583,6 @@ public class ChessClient implements NotificationHandler {
         } catch (NumberFormatException exception) {
             return false;
         }
-    }
-
-
-    public void notify(Notification notification) {
-        System.out.println(notification.message());
     }
 
     @Override
