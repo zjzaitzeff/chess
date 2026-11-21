@@ -80,7 +80,7 @@ public class ChessClient implements NotificationHandler {
                     System.out.print("login format: <username> <password>\n");
                     String loginInput = scanner.nextLine();
                     String[] loginInfo = loginInput.trim().split("\\s+");
-                    if (loginCheck(loginInfo)) {
+                    if (CheckerAndStringHelper.loginCheck(loginInfo)) {
                         loggedIn = loginHelper(loginInfo);
                     } else {
                         System.out.print("login format incorrect, retry\n");
@@ -90,7 +90,7 @@ public class ChessClient implements NotificationHandler {
                     System.out.print("register format: <username> <password> <email>\n");
                     String registerInput = scanner.nextLine();
                     String[] registerInfo = registerInput.trim().split("\\s+");
-                    if (registerCheck(registerInfo)) {
+                    if (CheckerAndStringHelper.registerCheck(registerInfo)) {
                         String username = registerInfo[0];
                         String password = registerInfo[1];
                         String email = registerInfo[2];
@@ -111,7 +111,7 @@ public class ChessClient implements NotificationHandler {
     }
 
     private static boolean loginHelper(String[] loginInfo) {
-        if (loginCheck(loginInfo)) {
+        if (CheckerAndStringHelper.loginCheck(loginInfo)) {
             String username = loginInfo[0];
             String password = loginInfo[1];
             if (login(username, password)) {
@@ -142,10 +142,6 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
-    private static boolean loginCheck(String[] info) {
-        return info.length == 2;
-    }
-
     public static boolean register(String username, String password, String email) {
         try {
             RegisterRequest registerRequest = new RegisterRequest(username, password, email);
@@ -157,10 +153,6 @@ public class ChessClient implements NotificationHandler {
             System.out.print("Registration failed, try again\n");
             return false;
         }
-    }
-
-    private static boolean registerCheck(String[] info) {
-        return info.length == 3;
     }
 
     private static void postUI(String prefix, Scanner scanner, boolean loggedIn) {
@@ -178,7 +170,7 @@ public class ChessClient implements NotificationHandler {
                     System.out.print("Create format: <NAME>\n");
                     String createInput = scanner.nextLine();
                     String[] createInfo = createInput.trim().split("\\s+");
-                    if (createCheck(createInfo)) {
+                    if (CheckerAndStringHelper.createCheck(createInfo)) {
                         String gameName = createInfo[0];
                         create(gameName);
                     } else {
@@ -190,7 +182,7 @@ public class ChessClient implements NotificationHandler {
                     System.out.print("join format: <ID> [WHITE|BLACK]\n");
                     String joinInput = scanner.nextLine();
                     String[] joinInfo = joinInput.trim().split("\\s+");
-                    if (joinCheck(joinInfo)) {
+                    if (CheckerAndStringHelper.joinCheck(joinInfo)) {
                         String strID = joinInfo[0];
                         int id = parseInt(strID);
                         String color = joinInfo[1];
@@ -247,47 +239,13 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
-    private static boolean createCheck(String[] info) {
-        return info.length == 1;
-    }
-
     private static void list() {
         try {
             ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
             ListGamesResult listGamesResult = facade.listGames(listGamesRequest);
-            listHelper(listGamesResult);
+            CheckerAndStringHelper.listHelper(listGamesResult);
         } catch (DataAccessException exception) {
             System.out.print("List games failed, try again"+"\n");
-        }
-    }
-
-    private static void listHelper(ListGamesResult lgr) {
-        for (GameData game : lgr.games()) {
-            String whiteUser;
-            String blackUser;
-            if (game.whiteUsername() == null) {
-                whiteUser = "Open Spot";
-            } else {
-                whiteUser = game.whiteUsername();
-            }
-            if (game.blackUsername() == null) {
-                blackUser = "Open Spot";
-            } else {
-                blackUser = game.blackUsername();
-            }
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "GameID: " + game.gameID());
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName());
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser);
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + " Game Status: " + getGameStatusString(game.chess()) + "\n");
-        }
-    }
-
-    private static String getGameStatusString(ChessGame game) {
-        if (game.isGameOver()) {
-            return "Complete";
-        } else {
-            return "Not Complete";
         }
     }
 
@@ -304,7 +262,7 @@ public class ChessClient implements NotificationHandler {
     }
 
     private static void gameplay(String color, ChessGame game, Scanner scanner, int gameID) {
-        boolean gameOver = determineIfGameComplete(game);
+        boolean gameOver = CheckerAndStringHelper.determineIfGameComplete(game);
         boolean wantsToLeave = false;
         ws.joinGame(authToken, gameID);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
@@ -313,7 +271,7 @@ public class ChessClient implements NotificationHandler {
             String input = scanner.nextLine();
             switch (input) {
                 case "help" -> helpGameplay();
-                case "redraw" -> printBoard(currGame, color, null);
+                case "redraw" -> PrintBoardHelper.printBoard(currGame, color, null);
                 case "leave" -> {
                     wantsToLeave = true;
                     System.out.print("You have left the game. Returning to menu\n");
@@ -328,8 +286,8 @@ public class ChessClient implements NotificationHandler {
                         System.out.print("if you need to promote add <promotion> EX: queen\n");
                         String makeMoveInput = scanner.nextLine();
                         String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
-                        if (makeMoveCheck(makeMoveInfo)) {
-                            ChessMove chessMove = convertStringToChessMove(makeMoveInfo);
+                        if (CheckerAndStringHelper.makeMoveCheck(makeMoveInfo)) {
+                            ChessMove chessMove = CheckerAndStringHelper.convertStringToChessMove(makeMoveInfo);
                             ws.makeMove(authToken, gameID, chessMove);
                         } else {
                             System.out.print("Incorrect format, please retry\n");
@@ -346,135 +304,16 @@ public class ChessClient implements NotificationHandler {
                     System.out.print("Highlight format <col><row>\nEX: e2 \n");
                     String highlightInput = scanner.nextLine();
                     String[] highlightInfo = highlightInput.trim().split("\\s+");
-                    if (highlightCheck(highlightInfo)) {
-                        ChessPosition chessPosition = createChessPosition(highlightInput);
-                        printBoard(currGame, color, chessPosition);
+                    if (CheckerAndStringHelper.highlightCheck(highlightInfo)) {
+                        ChessPosition chessPosition = CheckerAndStringHelper.createChessPosition(highlightInput);
+                        PrintBoardHelper.printBoard(currGame, color, chessPosition);
+                    } else {
+                        System.out.print("Highlight format incorrect\n");
                     }
                 }
                 default -> System.out.print("Incorrect input, type help for option\n");
             }
         }
-    }
-
-    private static boolean determineIfGameComplete(ChessGame game) {
-        if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            return true;
-        } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
-            return true;
-        } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            return true;
-        } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private static boolean highlightCheck(String[] info) {
-        Collection<String> approvedLetters = List.of("a", "b", "c", "d", "e", "f", "g", "h");
-        Collection<String> approvedNumbers = List.of("1", "2", "3", "4", "5", "6", "7", "8");
-        if (info.length != 1) {
-            return false;
-        }
-        String position = info[0];
-        if (position.length() != 2) {
-            return false;
-        }
-        if (!approvedLetters.contains(String.valueOf(position.charAt(0)))) {
-            return false;
-        }
-        if (!approvedNumbers.contains(String.valueOf(position.charAt(1)))) {
-            return false;
-        }
-        return true;
-
-    }
-
-    private static ChessMove convertStringToChessMove(String[] input) {
-        String pos1 = input[0];
-        String pos2 = input[1];
-        ChessPosition chessPosition1 = createChessPosition(pos1);
-        ChessPosition chessPosition2 = createChessPosition(pos2);
-        if (input.length == 3) {
-            String promotion = input[2];
-            ChessPiece.PieceType promotionType = generatePromotionType(promotion);
-            return new ChessMove(chessPosition1, chessPosition2, promotionType);
-        } else {
-            return new ChessMove(chessPosition1, chessPosition2, null);
-        }
-    }
-
-    private static ChessPosition createChessPosition(String pos) {
-        int col = Integer.parseInt(String.valueOf(pos.charAt(1)));
-        String r = String.valueOf(pos.charAt(0));
-        int row = switch (r) {
-            case "a" -> 1;
-            case "b" -> 2;
-            case "c" -> 3;
-            case "d" -> 4;
-            case "e" -> 5;
-            case "f" -> 6;
-            case "g" -> 7;
-            case "h" -> 8;
-            default -> 0;
-        };
-        return new ChessPosition(col,row);
-    }
-
-    private static ChessPiece.PieceType generatePromotionType(String promotion) {
-        return switch (promotion) {
-            case "knight" -> ChessPiece.PieceType.KNIGHT;
-            case "bishop" -> ChessPiece.PieceType.BISHOP;
-            case "queen" -> ChessPiece.PieceType.QUEEN;
-            case "rook" -> ChessPiece.PieceType.ROOK;
-            default -> null;
-        };
-    }
-
-    private static boolean makeMoveCheck(String[] input) {
-        Collection<String> approvedLetters = List.of("a", "b", "c", "d", "e", "f", "g", "h");
-        Collection<String> approvedNumbers = List.of("1", "2", "3", "4", "5", "6", "7", "8");
-        Collection<String> approvedPromotions = List.of("knight","bishop","queen","rook");
-        if (input.length == 3) {
-            String pos1 = input[0];
-            String pos2 = input[1];
-            String promotion = input[2];
-            if (!makeMoveCheckPositions(pos1, pos2, approvedLetters, approvedNumbers)) {
-                return false;
-            }
-            if (!approvedPromotions.contains(promotion)) {
-                return false;
-            }
-            return true;
-        } else if (input.length == 2) {
-            String pos1 = input[0];
-            String pos2 = input[1];
-            return makeMoveCheckPositions(pos1, pos2, approvedLetters, approvedNumbers);
-        } else {
-            return false;
-        }
-    }
-
-    private static boolean makeMoveCheckPositions(String pos1, String pos2, Collection<String> approvedLetters, Collection<String> approvedNumbers) {
-            if (pos1.length() != 2) {
-                return false;
-            }
-            if (pos2.length() != 2) {
-                return false;
-            }
-            if (!approvedLetters.contains(String.valueOf(pos1.charAt(0)))) {
-                return false;
-            }
-            if (!approvedNumbers.contains(String.valueOf(pos1.charAt(1)))) {
-                return false;
-            }
-            if (!approvedLetters.contains(String.valueOf(pos2.charAt(0)))) {
-                return false;
-            }
-            if (!approvedNumbers.contains(String.valueOf(pos2.charAt(1)))) {
-                return false;
-            }
-            return true;
     }
 
     private static void helpGameplay() {
@@ -502,142 +341,6 @@ public class ChessClient implements NotificationHandler {
         return null;
     }
 
-    private static void printBoard(ChessGame game, String color, ChessPosition chessPosition) {
-        ChessBoard board = game.getBoard();
-        Collection<ChessMove> validMoves;
-        if (chessPosition != null) {
-            validMoves = game.validMoves(chessPosition);
-        } else {
-            validMoves = null;
-        }
-        if (color.equals("WHITE")) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + "  A  B  C  D  E  F  G  H  \n");
-            for (int i = 8; i > 0; i--) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i);
-                if (i % 2 == 0) {
-                    printWhiteRowWhite(board, i, validMoves, chessPosition);
-                } else {
-                    printBlackRowWhite(board, i,  validMoves, chessPosition);
-                }
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i + "\n");
-            }
-            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + "  A  B  C  D  E  F  G  H  \n");
-        } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + "  H  G  F  E  D  C  B  A  \n");
-            for (int i = 1; i < 9; i++) {
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i);
-                if (i % 2 == 0) {
-                    printBlackRowBlack(board, i, validMoves, chessPosition);
-                } else {
-                    printWhiteRowBlack(board, i, validMoves, chessPosition);
-                }
-                System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + i + "\n");
-            }
-            System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY + EscapeSequences.SET_TEXT_COLOR_BLACK + "  H  G  F  E  D  C  B  A  \n");
-        }
-    }
-
-    private static void printWhiteRowWhite(ChessBoard board, int r, Collection<ChessMove> validMoves, ChessPosition piecePosition) {
-        for (int j = 1; j < 9; j++) {
-            whiteRowHelper(board,r,j, validMoves, piecePosition);
-        }
-    }
-
-    private static void printBlackRowWhite(ChessBoard board, int r, Collection<ChessMove> validMoves, ChessPosition piecePosition) {
-        for (int j = 1; j < 9; j++) {
-            blackRowHelper(board, r, j, validMoves, piecePosition);
-        }
-    }
-
-    private static void printWhiteRowBlack(ChessBoard board, int r, Collection<ChessMove> validMoves, ChessPosition piecePosition) {
-        for (int j = 8; j > 0; j --) {
-            whiteRowHelper(board,r,j,validMoves, piecePosition);
-        }
-    }
-
-    private static void printBlackRowBlack(ChessBoard board, int r, Collection<ChessMove> validMoves, ChessPosition piecePosition) {
-        for (int j = 8; j > 0; j --) {
-            blackRowHelper(board, r, j, validMoves, piecePosition);
-        }
-    }
-
-    private static void blackRowHelper(ChessBoard board, int r, int j, Collection<ChessMove> validMoves, ChessPosition piecePosition) {
-        ChessPosition chessPosition = new ChessPosition(r, j);
-        if (j % 2 == 0) {
-            printOddHelper(r,j,validMoves,piecePosition,board,chessPosition);
-        } else {
-            printEvenHelper(r,j,validMoves,piecePosition,board,chessPosition);
-        }
-    }
-
-    private static void whiteRowHelper(ChessBoard board, int r, int j, Collection<ChessMove> validMoves, ChessPosition piecePosition) {
-        ChessPosition chessPosition = new ChessPosition(r, j);
-        if (j % 2 == 0) {
-            printEvenHelper(r,j,validMoves,piecePosition,board,chessPosition);
-        } else {
-            printOddHelper(r,j,validMoves,piecePosition,board,chessPosition);
-        }
-    }
-
-    private static void printEvenHelper(int r, int j, Collection<ChessMove> validMoves, ChessPosition piecePosition, ChessBoard board, ChessPosition chessPosition) {
-        if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN + getPieceStr(board, r, j));
-        } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
-        } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
-        }
-    }
-
-    private static void printOddHelper(int r, int j, Collection<ChessMove> validMoves, ChessPosition piecePosition, ChessBoard board, ChessPosition chessPosition) {
-        if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_GREEN + getPieceStr(board, r, j));
-        } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
-        } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
-        }
-    }
-
-    private static boolean checkIfInValidMoves(Collection<ChessMove> validMoves, ChessPosition chessPosition) {
-        for (ChessMove move : validMoves) {
-            if (chessPosition.equals(move.getEndPosition())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    private static String getPieceStr(ChessBoard board, int r, int c) {
-        ChessPiece p = board.getPiece(new ChessPosition(r,c));
-        if (p == null) {
-            return "   ";
-        } else if (p.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
-            return EscapeSequences.SET_TEXT_COLOR_WHITE + pieceSelect(p);
-        } else {
-            return EscapeSequences.SET_TEXT_COLOR_BLACK + pieceSelect(p);
-        }
-    }
-
-    private static String pieceSelect(ChessPiece piece) {
-        if (piece == null) {
-            return "   ";
-        } else if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN)) {
-            return " P ";
-        } else if (piece.getPieceType().equals(ChessPiece.PieceType.ROOK)) {
-            return " R ";
-        } else if (piece.getPieceType().equals(ChessPiece.PieceType.KNIGHT)) {
-            return " N ";
-        } else if (piece.getPieceType().equals(ChessPiece.PieceType.BISHOP)) {
-            return " B ";
-        } else if (piece.getPieceType().equals(ChessPiece.PieceType.QUEEN)) {
-            return " Q ";
-        } else if (piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
-            return " K ";
-        } else {
-            return "   ";
-        }
-    }
-
     private static void clearDataBase() {
         try {
             ClearResult clearResult = facade.clear();
@@ -645,23 +348,6 @@ public class ChessClient implements NotificationHandler {
         } catch (DataAccessException exception) {
             System.out.print("Clear game failed, try again"+"\n");
         }
-    }
-
-    private static boolean joinCheck(String[] info) {
-        if (info.length != 2) {
-            return false;
-        }
-        boolean isNum;
-        try {
-            parseInt(info[0]);
-            isNum = true;
-        } catch (NumberFormatException exception) {
-            isNum = false;
-        }
-        if (!isNum) {
-            return false;
-        }
-        return info[1].equals("WHITE") || info[1].equals("BLACK");
     }
 
     private static void observe(int id, Scanner scanner) {
@@ -705,7 +391,7 @@ public class ChessClient implements NotificationHandler {
         if (serverMessage instanceof LoadGameMessage loadGameMessage) {
             currGame = loadGameMessage.returnGame();
             System.out.print("\n");
-            printBoard(currGame, currColor, null);
+            PrintBoardHelper.printBoard(currGame, currColor, null);
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
         } else if (serverMessage instanceof NotificationMessage notificationMessage) {
             String message = notificationMessage.getMessage();
