@@ -333,7 +333,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void sendErrorNotification(Session session, String message) throws IOException {
         if (session.isOpen()) {
-            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"error: " + message);
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"Error: " + message);
             session.getRemote().sendString(new Gson().toJson(errorMessage));
         }
     }

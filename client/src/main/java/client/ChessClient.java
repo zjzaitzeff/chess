@@ -279,7 +279,7 @@ public class ChessClient implements NotificationHandler {
             System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName());
             System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser);
             System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser);
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Game Status:" + getGameStatusString(game.chess()) + "\n");
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + " Game Status: " + getGameStatusString(game.chess()) + "\n");
         }
     }
 
@@ -323,9 +323,9 @@ public class ChessClient implements NotificationHandler {
                 }
                 case "move" -> {
                     if (!gameOver) {
-                        System.out.print("Move format <col piece><row piece> <col target><row target> <promotion>\n");
+                        System.out.print("Move format <col piece><row piece> <col target><row target>\n");
                         System.out.print("Ex: e2 e4\n");
-                        System.out.print("if you need to promote add <type> EX: pawn\n");
+                        System.out.print("if you need to promote add <promotion> EX: queen\n");
                         String makeMoveInput = scanner.nextLine();
                         String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
                         if (makeMoveCheck(makeMoveInfo)) {
@@ -439,22 +439,7 @@ public class ChessClient implements NotificationHandler {
             String pos1 = input[0];
             String pos2 = input[1];
             String promotion = input[2];
-            if (pos1.length() != 2) {
-                return false;
-            }
-            if (pos2.length() != 2) {
-                return false;
-            }
-            if (!approvedLetters.contains(String.valueOf(pos1.charAt(0)))) {
-                return false;
-            }
-            if (!approvedNumbers.contains(String.valueOf(pos1.charAt(1)))) {
-                return false;
-            }
-            if (!approvedLetters.contains(String.valueOf(pos2.charAt(0)))) {
-                return false;
-            }
-            if (!approvedNumbers.contains(String.valueOf(pos2.charAt(1)))) {
+            if (!makeMoveCheckPositions(pos1, pos2, approvedLetters, approvedNumbers)) {
                 return false;
             }
             if (!approvedPromotions.contains(promotion)) {
@@ -464,6 +449,13 @@ public class ChessClient implements NotificationHandler {
         } else if (input.length == 2) {
             String pos1 = input[0];
             String pos2 = input[1];
+            return makeMoveCheckPositions(pos1, pos2, approvedLetters, approvedNumbers);
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean makeMoveCheckPositions(String pos1, String pos2, Collection<String> approvedLetters, Collection<String> approvedNumbers) {
             if (pos1.length() != 2) {
                 return false;
             }
@@ -483,9 +475,6 @@ public class ChessClient implements NotificationHandler {
                 return false;
             }
             return true;
-        } else {
-            return false;
-        }
     }
 
     private static void helpGameplay() {
