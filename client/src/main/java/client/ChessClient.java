@@ -291,23 +291,7 @@ public class ChessClient implements NotificationHandler {
                     currGame = null;
                     currColor = null;
                 }
-                case "move" -> {
-                    if (!gameOver) {
-                        System.out.print("Move format <col piece><row piece> <col target><row target>\n");
-                        System.out.print("Ex: e2 e4\n");
-                        System.out.print("if you need to promote add <promotion> EX: queen\n");
-                        String makeMoveInput = scanner.nextLine();
-                        String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
-                        if (CheckerAndStringHelper.makeMoveCheck(makeMoveInfo)) {
-                            ChessMove chessMove = CheckerAndStringHelper.convertStringToChessMove(makeMoveInfo);
-                            ws.makeMove(authToken, gameID, chessMove);
-                        } else {
-                            System.out.print("Incorrect format, please retry\n");
-                        }
-                    } else {
-                        System.out.print("game is over you can not make a move\n");
-                    }
-                }
+                case "move" -> moveHelper(gameOver, scanner, gameID);
                 case "resign" -> {
                     gameOver = true;
                     ws.resign(authToken, gameID);
@@ -325,6 +309,24 @@ public class ChessClient implements NotificationHandler {
                 }
                 default -> System.out.print("Incorrect input, type help for option\n");
             }
+        }
+    }
+
+    private static void moveHelper(boolean gameOver, Scanner scanner, int gameID) {
+        if (!gameOver) {
+            System.out.print("Move format <col piece><row piece> <col target><row target>\n");
+            System.out.print("Ex: e2 e4\n");
+            System.out.print("if you need to promote add <promotion> EX: queen\n");
+            String makeMoveInput = scanner.nextLine();
+            String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
+            if (CheckerAndStringHelper.makeMoveCheck(makeMoveInfo)) {
+                ChessMove chessMove = CheckerAndStringHelper.convertStringToChessMove(makeMoveInfo);
+                ws.makeMove(authToken, gameID, chessMove);
+            } else {
+                System.out.print("Incorrect format, please retry\n");
+            }
+        } else {
+            System.out.print("game is over you can not make a move\n");
         }
     }
 
