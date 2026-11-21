@@ -49,7 +49,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case UserGameCommand.CommandType.CONNECT -> enter(action.getAuthToken(), wsMessageContext.session, action.getGameID());
                 case UserGameCommand.CommandType.RESIGN -> resign(action.getAuthToken(), action.getGameID(), wsMessageContext.session);
                 case UserGameCommand.CommandType.LEAVE -> exit(action.getAuthToken(), wsMessageContext.session, action.getGameID());
-                case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(action.getAuthToken(), wsMessageContext.session, action.getGameID(), action.getChessMove());
+                case UserGameCommand.CommandType.MAKE_MOVE -> {
+                    String authToken = action.getAuthToken();
+                    Session session = wsMessageContext.session;
+                    int gameID = action.getGameID();
+                    ChessMove move = action.getChessMove();
+                    makeMove(authToken, session , gameID, move);
+                }
             }
 
         } catch (IOException ex) {
@@ -190,7 +196,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 ChessGame game = gameData.chess();
                 try {
                     game.makeMove(chessMove);
-                    gameDAO.updateGame(gameData.gameID(), new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
+                    int currID = gameData.gameID();
+                    String wUsername = gameData.whiteUsername();
+                    String bUsername = gameData.blackUsername();
+                    String name = gameData.gameName();
+                    gameDAO.updateGame(currID, new GameData(currID, wUsername, bUsername, name, game));
                     //send LOAD_GAME to all clients
                     connections.broadcastLoadGameAllPlayers(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game), gameID);
                     //send Notification to all OTHER clients informing them what move was made
