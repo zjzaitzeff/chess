@@ -63,7 +63,7 @@ public class ChessClient implements NotificationHandler {
     private static void quit(Scanner scanner) {
         System.out.print("Quiting Game");
         scanner.close();
-        clearDataBase();
+        //clearDataBase();
         System.exit(0);
     }
 
@@ -82,6 +82,8 @@ public class ChessClient implements NotificationHandler {
                     String[] loginInfo = loginInput.trim().split("\\s+");
                     if (loginCheck(loginInfo)) {
                         loggedIn = loginHelper(loginInfo);
+                    } else {
+                        System.out.print("login format incorrect, retry\n");
                     }
                 }
                 case "register" -> {
@@ -309,7 +311,9 @@ public class ChessClient implements NotificationHandler {
                 }
                 case "move" -> {
                     if (!gameOver) {
-                        System.out.print("Move format <col piece><row piece> <col target><row target> <promotion>\nEx: e2 e4 pawn\nif you don't want to promote type none\n");
+                        System.out.print("Move format <col piece><row piece> <col target><row target> <promotion>\n");
+                        System.out.print("Ex: e2 e4\n");
+                        System.out.print("if you need to promote add <type> EX: pawn\n");
                         String makeMoveInput = scanner.nextLine();
                         String[] makeMoveInfo = makeMoveInput.trim().split("\\s+");
                         if (makeMoveCheck(makeMoveInfo)) {
@@ -377,11 +381,15 @@ public class ChessClient implements NotificationHandler {
     private static ChessMove convertStringToChessMove(String[] input) {
         String pos1 = input[0];
         String pos2 = input[1];
-        String promotion = input[2];
         ChessPosition chessPosition1 = createChessPosition(pos1);
         ChessPosition chessPosition2 = createChessPosition(pos2);
-        ChessPiece.PieceType promotionType = generatePromotionType(promotion);
-        return new ChessMove(chessPosition1, chessPosition2, promotionType);
+        if (input.length == 3) {
+            String promotion = input[2];
+            ChessPiece.PieceType promotionType = generatePromotionType(promotion);
+            return new ChessMove(chessPosition1, chessPosition2, promotionType);
+        } else {
+            return new ChessMove(chessPosition1, chessPosition2, null);
+        }
     }
 
     private static ChessPosition createChessPosition(String pos) {
@@ -414,35 +422,58 @@ public class ChessClient implements NotificationHandler {
     private static boolean makeMoveCheck(String[] input) {
         Collection<String> approvedLetters = List.of("a", "b", "c", "d", "e", "f", "g", "h");
         Collection<String> approvedNumbers = List.of("1", "2", "3", "4", "5", "6", "7", "8");
-        Collection<String> approvedPromotions = List.of("knight","bishop","queen","rook", "none");
-        if (input.length != 3) {
+        Collection<String> approvedPromotions = List.of("knight","bishop","queen","rook");
+        if (input.length == 3) {
+            String pos1 = input[0];
+            String pos2 = input[1];
+            String promotion = input[2];
+            if (pos1.length() != 2) {
+                return false;
+            }
+            if (pos2.length() != 2) {
+                return false;
+            }
+            if (!approvedLetters.contains(String.valueOf(pos1.charAt(0)))) {
+                return false;
+            }
+            if (!approvedNumbers.contains(String.valueOf(pos1.charAt(1)))) {
+                return false;
+            }
+            if (!approvedLetters.contains(String.valueOf(pos2.charAt(0)))) {
+                return false;
+            }
+            if (!approvedNumbers.contains(String.valueOf(pos2.charAt(1)))) {
+                return false;
+            }
+            if (!approvedPromotions.contains(promotion)) {
+                return false;
+            }
+            return true;
+        } else if (input.length == 2) {
+            String pos1 = input[0];
+            String pos2 = input[1];
+            if (pos1.length() != 2) {
+                return false;
+            }
+            if (pos2.length() != 2) {
+                return false;
+            }
+            if (!approvedLetters.contains(String.valueOf(pos1.charAt(0)))) {
+                return false;
+            }
+            if (!approvedNumbers.contains(String.valueOf(pos1.charAt(1)))) {
+                return false;
+            }
+            if (!approvedLetters.contains(String.valueOf(pos2.charAt(0)))) {
+                return false;
+            }
+            if (!approvedNumbers.contains(String.valueOf(pos2.charAt(1)))) {
+                return false;
+            }
+            return true;
+        } else {
             return false;
         }
-        String pos1 = input[0];
-        String pos2 = input[1];
-        String promotion = input[2];
-        if (pos1.length() != 2) {
-            return false;
-        }
-        if (pos2.length() !=2) {
-            return false;
-        }
-        if (!approvedLetters.contains(String.valueOf(pos1.charAt(0)))) {
-            return false;
-        }
-        if (!approvedNumbers.contains(String.valueOf(pos1.charAt(1)))) {
-            return false;
-        }
-        if (!approvedLetters.contains(String.valueOf(pos2.charAt(0)))) {
-            return false;
-        }
-        if (!approvedNumbers.contains(String.valueOf(pos2.charAt(1)))) {
-            return false;
-        }
-        if (!approvedPromotions.contains(promotion)) {
-            return false;
-        }
-        return true;
     }
 
     private static void helpGameplay() {
@@ -451,7 +482,7 @@ public class ChessClient implements NotificationHandler {
         System.out.print("leave - leave the game and return to previous menu\n");
         System.out.print("move - make a move\n");
         System.out.print("resign - resign *does not leave gameplay*\n");
-        System.out.print("highlight- indicate legal moves\n");
+        System.out.print("highlight - indicate legal moves\n");
     }
 
     private static ChessGame getGame(int id) {
