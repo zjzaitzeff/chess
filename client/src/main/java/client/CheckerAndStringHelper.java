@@ -45,7 +45,8 @@ public class CheckerAndStringHelper {
             System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName());
             System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser);
             System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser);
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + " Game Status: " + getGameStatusString(game.chess()) + "\n");
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + " Game Status: ");
+            System.out.print(getGameStatusString(game.chess()) + "\n");
         }
     }
 

@@ -85,23 +85,23 @@ public class PrintBoardHelper {
         }
     }
 
-    private static void printEvenHelper(int r, int j, Collection<ChessMove> validMoves, ChessPosition piecePosition, ChessBoard board, ChessPosition chessPosition) {
-        if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN + getPieceStr(board, r, j));
-        } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
+    private static void printEvenHelper(int r, int j, Collection<ChessMove> vm, ChessPosition pPos, ChessBoard b, ChessPosition cPos) {
+        if (vm != null && checkIfInValidMoves(vm,cPos)) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN + getPieceStr(b, r, j));
+        } else if (pPos != null && pPos.equals(cPos)) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(b, r, j));
         } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(board, r, j));
+            System.out.print(EscapeSequences.SET_BG_COLOR_RED + getPieceStr(b, r, j));
         }
     }
 
-    private static void printOddHelper(int r, int j, Collection<ChessMove> validMoves, ChessPosition piecePosition, ChessBoard board, ChessPosition chessPosition) {
-        if (validMoves != null && checkIfInValidMoves(validMoves,chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_GREEN + getPieceStr(board, r, j));
-        } else if (piecePosition != null && piecePosition.equals(chessPosition)) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(board, r, j));
+    private static void printOddHelper(int r, int j, Collection<ChessMove> vm, ChessPosition pPos, ChessBoard b, ChessPosition cPos) {
+        if (vm != null && checkIfInValidMoves(vm,cPos)) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_GREEN + getPieceStr(b, r, j));
+        } else if (pPos != null && pPos.equals(cPos)) {
+            System.out.print(EscapeSequences.SET_BG_COLOR_BLUE + getPieceStr(b, r, j));
         } else {
-            System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(board, r, j));
+            System.out.print(EscapeSequences.SET_BG_COLOR_MAGENTA + getPieceStr(b, r, j));
         }
     }
 
