@@ -63,7 +63,7 @@ public class ChessClient implements NotificationHandler {
     private static void quit(Scanner scanner) {
         System.out.print("Quiting Game");
         scanner.close();
-        //clearDataBase();
+        clearDataBase();
         System.exit(0);
     }
 
@@ -275,7 +275,19 @@ public class ChessClient implements NotificationHandler {
             } else {
                 blackUser = game.blackUsername();
             }
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "GameID: " + game.gameID() + EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName() + EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser + EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser +"\n");
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "GameID: " + game.gameID());
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN + " Game Name: " + game.gameName());
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE +" White Player: " + whiteUser);
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_YELLOW + " Black Player: " + blackUser);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Game Status:" + getGameStatusString(game.chess()) + "\n");
+        }
+    }
+
+    private static String getGameStatusString(ChessGame game) {
+        if (game.isGameOver()) {
+            return "Complete";
+        } else {
+            return "Not Complete";
         }
     }
 
