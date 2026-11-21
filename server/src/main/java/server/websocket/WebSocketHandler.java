@@ -204,7 +204,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     //send LOAD_GAME to all clients
                     connections.broadcastLoadGameAllPlayers(new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game), gameID);
                     //send Notification to all OTHER clients informing them what move was made
-                    String message = String.format("%s (%s) moved: %s\n", authDAO.getAuth(authToken).username(), getColor(authToken, gameID), chessMoveString(chessMove));
+                    String username = authDAO.getAuth(authToken).username();
+                    String message = String.format("%s (%s) moved: %s\n", username, getColor(authToken, gameID), chessMoveString(chessMove));
                     connections.broadcast(session, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message), gameID);
                     //if move results in check, checkmate, stalemate, Send Notification to all clients
                     checks(authToken, gameID);
