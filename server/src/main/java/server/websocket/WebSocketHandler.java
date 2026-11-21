@@ -10,6 +10,7 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
@@ -242,10 +243,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String oppColor = getOppositeColor(color);
         ChessGame.TeamColor playerColor = returnTeamColor(oppColor);
         if (playerColor != null) {
-            if (game.isInCheck(playerColor)) {
-                String message = String.format("%s is in check\n", convertToStringFromTeamObject(game.getTeamTurn()));
-                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
-            } else if (game.isInStalemate(playerColor)) {
+            if (game.isInStalemate(playerColor)) {
                 String message = String.format("%s is in stalemate\n", convertToStringFromTeamObject(game.getTeamTurn()));
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                 completedGames.add(gameID);
@@ -253,6 +251,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 String message = String.format("%s is in checkmate\n", convertToStringFromTeamObject(game.getTeamTurn()));
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
                 completedGames.add(gameID);
+            } else if (game.isInCheck(playerColor)) {
+                String message = String.format("%s is in check\n", convertToStringFromTeamObject(game.getTeamTurn()));
+                connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message));
             }
         }
     }
@@ -305,8 +306,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void sendErrorNotification(Session session, String message) throws IOException {
         if (session.isOpen()) {
-            NotificationMessage notificationMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            session.getRemote().sendString(new Gson().toJson(notificationMessage));
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"error: " + message);
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
         }
     }
 }

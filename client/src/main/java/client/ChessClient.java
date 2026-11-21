@@ -63,7 +63,7 @@ public class ChessClient implements NotificationHandler {
     private static void quit(Scanner scanner) {
         System.out.print("Quiting Game");
         scanner.close();
-//        clearDataBase();
+        clearDataBase();
         System.exit(0);
     }
 
@@ -281,33 +281,25 @@ public class ChessClient implements NotificationHandler {
         try {
             JoinGameRequest joinGameRequest = new JoinGameRequest(color, id);
             JoinGameResult joinGameResult = facade.joinGame(joinGameRequest, authToken);
-//            System.out.print("Joined game: initiating gameplay"+"\n");
             ChessGame game = getGame(id);
             currColor = color;
             gameplay(color, game, scanner, id);
-//            assert game != null;
-//            printBoard(game, color);
         } catch (DataAccessException exception) {
             System.out.print("Failed to join game: try again"+"\n");
         }
     }
 
     private static void gameplay(String color, ChessGame game, Scanner scanner, int gameID) {
-        //help - display options
-        //redraw chess board - redraws chessboard
-        //leave - return to post UI
-        // Make Move - make a move
-        // Resign - Doesn't leave but ends game
-        // Highlight legal Moves - input piece for which they want to highlight legal moves, the selected pieces's current square and all squares it can legally move are highlighted.
         boolean gameOver = determineIfGameComplete(game);
         boolean wantsToLeave = false;
         ws.joinGame(authToken, gameID);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "Joined game! Type help for options\n");
         while (!wantsToLeave) {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
             String input = scanner.nextLine();
             switch (input) {
                 case "help" -> helpGameplay();
-                case "redraw" -> printBoard(game, color, null);
+                case "redraw" -> printBoard(currGame, color, null);
                 case "leave" -> {
                     wantsToLeave = true;
                     System.out.print("You have left the game. Returning to menu\n");
@@ -315,7 +307,7 @@ public class ChessClient implements NotificationHandler {
                     currGame = null;
                     currColor = null;
                 }
-                case "make move" -> {
+                case "move" -> {
                     if (!gameOver) {
                         System.out.print("Move format <col piece><row piece> <col target><row target> <promotion>\nEx: e2 e4 pawn\nif you don't want to promote type none\n");
                         String makeMoveInput = scanner.nextLine();
@@ -340,12 +332,11 @@ public class ChessClient implements NotificationHandler {
                     String[] highlightInfo = highlightInput.trim().split("\\s+");
                     if (highlightCheck(highlightInfo)) {
                         ChessPosition chessPosition = createChessPosition(highlightInput);
-                        printBoard(game, color, chessPosition);
+                        printBoard(currGame, color, chessPosition);
                     }
                 }
                 default -> System.out.print("Incorrect input, type help for option\n");
             }
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
         }
     }
 
@@ -458,7 +449,7 @@ public class ChessClient implements NotificationHandler {
         System.out.print("help - Display possible options\n");
         System.out.print("redraw - redraws chessboard\n");
         System.out.print("leave - leave the game and return to previous menu\n");
-        System.out.print("make move - make a move\n");
+        System.out.print("move - make a move\n");
         System.out.print("resign - resign *does not leave gameplay*\n");
         System.out.print("highlight- indicate legal moves\n");
     }
@@ -685,6 +676,7 @@ public class ChessClient implements NotificationHandler {
     public void notify(ServerMessage serverMessage) {
         if (serverMessage instanceof LoadGameMessage loadGameMessage) {
             currGame = loadGameMessage.returnGame();
+            System.out.print("\n");
             printBoard(currGame, currColor, null);
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
         } else if (serverMessage instanceof NotificationMessage notificationMessage) {
@@ -692,7 +684,7 @@ public class ChessClient implements NotificationHandler {
             System.out.print("Notification: " + message);
         } else if (serverMessage instanceof ErrorMessage errorMessage) {
             String message = errorMessage.getMessage();
-            System.out.print("Error: " + message);
+            System.out.print(message);
         }
     }
 }
