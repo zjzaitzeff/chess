@@ -94,13 +94,9 @@ public class ChessClient implements NotificationHandler {
                         String username = registerInfo[0];
                         String password = registerInfo[1];
                         String email = registerInfo[2];
-                        if (register(username, password, email)) {
-                        if (login(username, password)) {
-                            System.out.print("Logged in as: " + username + "\n");
+                        if (registerHelperNester(username,password,email)) {
                             loggedIn = true;
-                        } else {
-                            System.out.print("Registered but failed to login\n");
-                        }}
+                        }
                     } else {
                         System.out.print("Incorrect input: <username> <password> <email>\nIf you want to register please type register\n");
                     }
@@ -108,6 +104,19 @@ public class ChessClient implements NotificationHandler {
                 default -> System.out.print("incorrect input, please use command Help to see correct inputs\n");
             }
         }
+    }
+
+    private static boolean registerHelperNester(String username, String password, String email) {
+        if (register(username, password, email)) {
+            if (login(username, password)) {
+                System.out.print("Logged in as: " + username + "\n");
+                return true;
+            } else {
+                System.out.print("Registered but failed to login\n");
+                return false;
+            }
+        }
+        return false;
     }
 
     private static boolean loginHelper(String[] loginInfo) {
