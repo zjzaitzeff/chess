@@ -11,19 +11,22 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final ConcurrentHashMap<Session, Session> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, ConcurrentHashMap<Session, Session>> connections = new ConcurrentHashMap<>();
 
-    public void add(Session session) {
-        connections.put(session, session);
+    public void add(Session session, Integer gameID) {
+        connections.putIfAbsent(gameID, new ConcurrentHashMap<>());
+        connections.get(gameID).put(session, session);
     }
 
-    public void remove(Session session) {
-        connections.remove(session);
+    public void remove(Session session, Integer gameID) {
+        var sessions = connections.get(gameID);
+        sessions.remove(session);
     }
 
-    public void broadcast(Session excludeSession, NotificationMessage notificationMessage) throws IOException {
+    public void broadcast(Session excludeSession, NotificationMessage notificationMessage, Integer gameID) throws IOException {
         String msg = new Gson().toJson(notificationMessage);
-        for (Session c : connections.values()) {
+        var sessions = connections.get(gameID);
+        for (Session c : sessions.values()) {
             if (c.isOpen()) {
                 if (!c.equals(excludeSession)) {
                     c.getRemote().sendString(msg);
@@ -31,9 +34,10 @@ public class ConnectionManager {
             }
         }
     }
-    public void broadcastLoadGameAllPlayers(LoadGameMessage loadGameMessage) throws IOException {
+    public void broadcastLoadGameAllPlayers(LoadGameMessage loadGameMessage, Integer gameID) throws IOException {
         String message = new Gson().toJson(loadGameMessage);
-        for (Session c : connections.values()) {
+        var sessions = connections.get(gameID);
+        for (Session c : sessions.values()) {
             if (c.isOpen()) {
                 c.getRemote().sendString(message);
             }

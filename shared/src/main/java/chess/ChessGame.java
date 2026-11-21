@@ -13,6 +13,7 @@ import java.util.Objects;
 public class ChessGame {
     TeamColor whoseTurn;
     ChessBoard theBoard;
+    boolean gameOver = false;
     public ChessGame() {
         theBoard = new ChessBoard();
         theBoard.resetBoard();
@@ -216,6 +217,14 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return theBoard;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void gameNowOver() {
+        gameOver = true;
     }
 
     @Override
