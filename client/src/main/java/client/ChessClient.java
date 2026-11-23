@@ -293,8 +293,14 @@ public class ChessClient implements NotificationHandler {
                 }
                 case "move" -> moveHelper(gameOver, scanner, gameID);
                 case "resign" -> {
-                    gameOver = true;
-                    ws.resign(authToken, gameID);
+                    System.out.print("Are you sure: y/n\n");
+                    String resignInput = scanner.nextLine();
+                    if (resignInput.equals("y")) {
+                        gameOver = true;
+                        ws.resign(authToken, gameID);
+                    } else {
+                        System.out.print("Incorrect input, or declined to resign. try again.\n");
+                    }
                 }
                 case "highlight" -> {
                     System.out.print("Highlight format <col><row>\nEX: e2 \n");
@@ -375,17 +381,41 @@ public class ChessClient implements NotificationHandler {
             ws.joinGame(authToken, id);
             boolean wantsToLeave = false;
             System.out.print("Observing game: " + id +"\n");
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + "type leave to stop observing, type help to see options\n");
             while (!wantsToLeave) {
-                System.out.print("type leave to stop observing, type help to see this message again\n");
+                System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + ">>> ");
                 String input = scanner.nextLine();
                 if (input.equals("leave")) {
                     System.out.print("leaving game\n");
                     wantsToLeave = true;
                     ws.leaveGame(authToken, id);
                     currColor = null;
+                } else if (input.equals("highlight")) {
+                    System.out.print("Highlight format <col><row>\nEX: e2 \n");
+                    String highlightInput = scanner.nextLine();
+                    String[] highlightInfo = highlightInput.trim().split("\\s+");
+                    if (CheckerAndStringHelper.highlightCheck(highlightInfo)) {
+                        ChessPosition chessPosition = CheckerAndStringHelper.createChessPosition(highlightInput);
+                        PrintBoardHelper.printBoard(currGame, "WHITE", chessPosition);
+                    } else {
+                        System.out.print("Highlight format incorrect\n");
+                    }
+                } else if (input.equals("redraw")) {
+                    PrintBoardHelper.printBoard(currGame, "WHITE", null);
+                } else if (input.equals("help")) {
+                    observeHelp();
+                } else {
+                    System.out.print("Input incorrect, try again.\n");
                 }
             }
         }
+    }
+
+    private static void observeHelp() {
+        // highlight redraw leave
+        System.out.print("leave - leave game\n");
+        System.out.print("highlight - highlight possible moves\n");
+        System.out.print("redraw - redraw board\n");
     }
 
     private static boolean observeCheck(String[] info) {

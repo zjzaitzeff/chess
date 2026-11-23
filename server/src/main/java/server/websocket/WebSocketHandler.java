@@ -276,23 +276,32 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String color = getColor(authToken, gameID);
         String oppColor = getOppositeColor(color);
         ChessGame.TeamColor playerColor = returnTeamColor(oppColor);
+        String username = getUsernameOfPlayerInStatus(gameID, playerColor);
         if (playerColor != null) {
             if (game.isInStalemate(playerColor)) {
-                String message = String.format("%s is in stalemate\n", convertToStringFromTeamObject(game.getTeamTurn()));
+                String message = String.format("%s (%s) is in stalemate\n", username,convertToStringFromTeamObject(game.getTeamTurn()));
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message), gameID);
                 GameData gameData = gameDAO.getGame(gameID);
                 game.gameNowOver();
                 gameDAO.updateGame(gameID, new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
             } else if (game.isInCheckmate(playerColor)) {
-                String message = String.format("%s is in checkmate\n", convertToStringFromTeamObject(game.getTeamTurn()));
+                String message = String.format("%s (%s) is in checkmate\n", username,convertToStringFromTeamObject(game.getTeamTurn()));
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message), gameID);
                 GameData gameData = gameDAO.getGame(gameID);
                 game.gameNowOver();
                 gameDAO.updateGame(gameID, new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game));
             } else if (game.isInCheck(playerColor)) {
-                String message = String.format("%s is in check\n", convertToStringFromTeamObject(game.getTeamTurn()));
+                String message = String.format("%s (%s) is in check\n", username,convertToStringFromTeamObject(game.getTeamTurn()));
                 connections.broadcast(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message), gameID);
             }
+        }
+    }
+
+    private String getUsernameOfPlayerInStatus(int gameID, ChessGame.TeamColor playerColor) throws DataAccessException {
+        if (playerColor.equals(ChessGame.TeamColor.WHITE)) {
+            return gameDAO.getGame(gameID).whiteUsername();
+        } else {
+            return gameDAO.getGame((gameID)).blackUsername();
         }
     }
 
